@@ -9,6 +9,7 @@ public class PlayerManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		currentItem = new ItemManager();
+		//currentItem = new ItemManager();
 		lightRadius = 50;
 	}
 	
