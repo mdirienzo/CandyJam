@@ -91,7 +91,7 @@ public class LevelManager : MonoBehaviour {
             do {
                 r = rnd.Next(this.rows);
                 c = rnd.Next(this.columns);
-                positionValid = !((r == this.rows / 2) || (c == this.columns / 2));
+                positionValid = !((r == this.rows / 2) && (c == this.columns / 2));
             } while (!positionValid);
 
             GameObject trapPrefab = this.trapPrefabs[rnd.Next(trapPrefabs.Length)];
