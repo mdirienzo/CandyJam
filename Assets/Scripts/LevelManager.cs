@@ -1,12 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
 public class LevelManager : MonoBehaviour {
+    public static LevelManager instance = null;
+
+    public enum TileSide {
+        NORTH, EAST, SOUTH, WEST
+    };
+
     public GameObject[] floorPrefabs;
     public GameObject[] xWallPrefabs;
     public GameObject[] yWallPrefabs;
     public int columns;
     public int rows;
+
+    private GameObject xClipWallPrefab = null;
+    private GameObject yClipWallPrefab = null;
+
+    void Awake() {
+        LevelManager.instance = this;
+        this.xClipWallPrefab = (GameObject)Resources.Load("x-clip-wall", typeof(GameObject));
+        this.yClipWallPrefab = (GameObject)Resources.Load("y-clip-wall", typeof(GameObject));
+    }
 
 	void Start() {
 		Debug.Log("LevelManager Start");
@@ -21,10 +37,30 @@ public class LevelManager : MonoBehaviour {
         this.PositionCameraAndLight();
 	}
 
-	// Update is called once per frame
-	void Update() {
+	void Update() { }
 
-	}
+    public Vector3 CenterOfMap() {
+        return this.CenterOfTile(this.rows / 2, this.columns / 2);
+    }
+
+    public Vector3 CenterOfTile(int r, int c) {
+        return new Vector3(c, r, 0);
+    }
+
+    public Vector3 CenterOfWall(int r, int c, TileSide side) {
+        switch (side) {
+            case TileSide.NORTH:
+                return this.CenterOfTile(r, c) + new Vector3( 0.0f,  0.5f, 0.0f);
+            case TileSide.EAST:
+                return this.CenterOfTile(r, c) + new Vector3( 0.5f,  0.0f, 0.0f);
+            case TileSide.SOUTH:
+                return this.CenterOfTile(r, c) + new Vector3( 0.0f, -0.5f, 0.0f);
+            case TileSide.WEST:
+                return this.CenterOfTile(r, c) + new Vector3(-0.5f,  0.0f, 0.0f);
+            default:
+                return Vector3.zero;
+        }
+    }
 
     private void BuildMap() {
         System.Random rnd = new System.Random();
@@ -32,19 +68,26 @@ public class LevelManager : MonoBehaviour {
         // create the map now that the configuration is validated
         for (int r = 0; r < rows; ++r) {
             for (int c = 0; c < columns; ++c) {
-                Vector3 position = new Vector3(c, r, 0);
                 GameObject floorPrefab = this.floorPrefabs[rnd.Next(floorPrefabs.Length)];
-                Instantiate(floorPrefab, position, Quaternion.identity);
-
-                if (r == 0) {
-                    GameObject wall = this.xWallPrefabs[rnd.Next(xWallPrefabs.Length)];
-                }
-
-                if (c == 0) {
-                    GameObject wall = this.yWallPrefabs[rnd.Next(yWallPrefabs.Length)];
-                }
-
+                Instantiate(floorPrefab, this.CenterOfTile(r, c), Quaternion.identity);
             }
+        }
+
+        /*
+            GameObject wallPrefab = this.yWallPrefabs[rnd.Next(yWallPrefabs.Length)];
+            Vector3 wallPosition = floorPosition + new Vector3(-0.5f, 0.0f, 0.0f);
+            Instantiate(wallPrefab, wallPosition, Quaternion.identity);
+
+            GameObject wallPrefab = this.xWallPrefabs[rnd.Next(xWallPrefabs.Length)];
+            Vector3 wallPosition = floorPosition + new Vector3(0.0f, -0.5f, 0.0f);
+            Instantiate(wallPrefab, wallPosition, Quaternion.identity);
+        */
+
+        for (int r = 0; r < rows; ++r) {
+
+        }
+
+        for (int c = 0; c < columns; ++c) {
         }
     }
 
