@@ -13,6 +13,7 @@ public class LevelManager : MonoBehaviour {
     public GameObject[] floorPrefabs;
     public GameObject[] xWallPrefabs;
     public GameObject[] yWallPrefabs;
+    public GameObject[] trapPrefabs;
     public int columns;
     public int rows;
 
@@ -71,13 +72,30 @@ public class LevelManager : MonoBehaviour {
     private void BuildMap() {
         System.Random rnd = new System.Random();
 
-        // create the map now that the configuration is validated
+        // create the floors
         for (int r = 0; r < this.rows; ++r) {
             for (int c = 0; c < this.columns; ++c) {
                 GameObject floorPrefab = this.floorPrefabs[rnd.Next(floorPrefabs.Length)];
-                Object floor = Instantiate(floorPrefab, this.CenterOfTile(r, c), Quaternion.identity);
+                Vector3 position = this.CenterOfTile(r, c);
+                position.z = 1.0f;
+                Object floor = Instantiate(floorPrefab, position, Quaternion.identity);
                 floor.name = "Floor (" + r + ", " + c + ")";
             }
+        }
+
+        // create the traps
+        for (int i = 0; i < (this.rows * this.columns) * 0.1f; ++i) {
+            int r = 0;
+            int c = 0;
+            bool positionValid = false;
+            do {
+                r = rnd.Next(this.rows);
+                c = rnd.Next(this.columns);
+                positionValid = !((r == this.rows / 2) || (c == this.columns / 2));
+            } while (!positionValid);
+
+            GameObject trapPrefab = this.trapPrefabs[rnd.Next(trapPrefabs.Length)];
+            Object trap = Instantiate(trapPrefab, this.CenterOfTile(r, c), Quaternion.identity);
         }
 
         /*
@@ -186,12 +204,25 @@ public class LevelManager : MonoBehaviour {
             }
         }
 
+        // trap prefabs
+        if (this.trapPrefabs.Length == 0) {
+            Debug.LogError("Trap prefabs not set.");
+            invalidConfiguration = true;
+        }
+
+        for (int i = 0; i < this.trapPrefabs.Length; ++i) {
+            if (this.trapPrefabs[i] == null) {
+                Debug.LogError("Trap prefab #" + i + " not set.");
+                invalidConfiguration = true;
+            }
+        }
+
         // and the row/column count
-        if (this.rows <= 0) {
+        if (this.rows <= 2) {
             Debug.LogError("Invalid row count.");
             invalidConfiguration = true;
         }
-        if (this.columns <= 0) {
+        if (this.columns <= 2) {
             Debug.LogError("Invalid column count.");
             invalidConfiguration = true;
         }
