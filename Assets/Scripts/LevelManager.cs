@@ -8,7 +8,6 @@ public class LevelManager : MonoBehaviour {
     public int columns;
     public int rows;
 
-
 	void Start() {
 		Debug.Log("LevelManager Start");
 
@@ -37,14 +36,14 @@ public class LevelManager : MonoBehaviour {
                 GameObject floorPrefab = this.floorPrefabs[rnd.Next(floorPrefabs.Length)];
                 Instantiate(floorPrefab, position, Quaternion.identity);
 
-                /*
-                if (tileType.hasNorthWall || r == 0) {
-                    GameObject prefab =
+                if (r == 0) {
+                    GameObject wall = this.xWallPrefabs[rnd.Next(xWallPrefabs.Length)];
                 }
 
-                if (tileType.hasWestWall || c == 0) {
+                if (c == 0) {
+                    GameObject wall = this.yWallPrefabs[rnd.Next(yWallPrefabs.Length)];
                 }
-                */
+
             }
         }
     }
