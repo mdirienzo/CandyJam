@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour {
 				for(int i = 0; i < numPlayers; i++){
 					playerRefs[i] = Instantiate(playerPrefab) as GameObject;
 					playerRefs[i].transform.position = LevelManager.instance.CenterOfMap();
-					playerRefs[i].transform.position+= (Vector3.back * 1);
+					//playerRefs[i].transform.position+= (Vector3.back);
 				}
 			}
 
