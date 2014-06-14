@@ -17,7 +17,7 @@ public class LevelManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	    int[][] map = new int[columns][row];
+	    int[,] map = new int[columns,row];
         // fill out map
         // go through map and clone
 	}
