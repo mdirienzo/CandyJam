@@ -144,7 +144,7 @@ public class LevelManager : MonoBehaviour {
     private void PositionCameraAndLight() {
         // Compute the center of the board, subtracting 0.5 since each tile is 1.0x1.0 with the origin at the center
         // The camera and light will be -5 Z above just to give plenty of room for walls and things
-        Vector3 center = new Vector3(columns / 2.0f - 0.5f, rows / 2.0f - 0.5f, -5.0f);
+        Vector3 center = new Vector3(columns / 2.0f - 0.5f, rows / 2.0f - 0.5f, -10.0f);
 
         // Reposition the camera at the location we want
         GameObject mainCameraObj = GameObject.FindWithTag("MainCamera");
