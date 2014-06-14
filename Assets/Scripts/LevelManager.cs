@@ -1,17 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[System.Serializable]
-public class TileType {
-    public GameObject floorPrefab;
-    public bool hasNorthWall;
-    public bool hasWestWall;
-}
-
 public class LevelManager : MonoBehaviour {
-    public TileType[] tileTypes;
-    public GameObject[] northWallPrefabs;
-    public GameObject[] westWallPrefabs;
+    public GameObject[] floorPrefabs;
+    public GameObject[] xWallPrefabs;
+    public GameObject[] yWallPrefabs;
     public int columns;
     public int rows;
 
@@ -41,8 +34,8 @@ public class LevelManager : MonoBehaviour {
         for (int r = 0; r < rows; ++r) {
             for (int c = 0; c < columns; ++c) {
                 Vector3 position = new Vector3(c, r, 0);
-                TileType tileType = this.tileTypes[rnd.Next(tileTypes.Length)];
-                Instantiate(tileType.floorPrefab, position, Quaternion.identity);
+                GameObject floorPrefab = this.floorPrefabs[rnd.Next(floorPrefabs.Length)];
+                Instantiate(floorPrefab, position, Quaternion.identity);
 
                 /*
                 if (tileType.hasNorthWall || r == 0) {
@@ -77,39 +70,43 @@ public class LevelManager : MonoBehaviour {
     private bool ValidateConfiguration() {
         bool invalidConfiguration = false;
 
-        // validate tile types
-        if (tileTypes.Length == 0) {
-            Debug.LogError("No tile types set.");
+        // validate floor prefabs
+        if (floorPrefabs.Length == 0) {
+            Debug.LogError("No floor prefabs set.");
             invalidConfiguration = true;
         }
 
-        for (int i = 0; i < tileTypes.Length; ++i) {
-            TileType tileType = tileTypes [i];
-            if (tileType.floorPrefab == null) {
-                Debug.LogError("Tile type " + i + " is not configured with a floor prefab.");
+
+        for (int i = 0; i < floorPrefabs.Length; ++i) {
+            if (floorPrefabs[i] == null) {
+                Debug.LogError("Floor prefab #" + i + " not set.");
                 invalidConfiguration = true;
             }
         }
 
         // and the wall prefabs
-        if (northWallPrefabs.Length == 0) {
-            Debug.LogError("North wall prefabs not set.");
+        if (xWallPrefabs.Length == 0) {
+            Debug.LogError("X wall prefabs not set.");
             invalidConfiguration = true;
         }
 
-        for (int i = 0; i < northWallPrefabs.Length; ++i) {
-            Debug.LogError("North wall prefab #" + i + " not set.");
+        for (int i = 0; i < xWallPrefabs.Length; ++i) {
+            if (xWallPrefabs[i] == null) {
+                Debug.LogError("X wall prefab #" + i + " not set.");
+                invalidConfiguration = true;
+            }
+        }
+
+        if (yWallPrefabs.Length == 0) {
+            Debug.LogError("Y wall prefab not set.");
             invalidConfiguration = true;
         }
 
-        if (westWallPrefabs.Length == 0) {
-            Debug.LogError("West wall prefab not set.");
-            invalidConfiguration = true;
-        }
-
-        for (int i = 0; i < westWallPrefabs.Length; ++i) {
-            Debug.LogError("West wall prefab #" + i + " not set.");
-            invalidConfiguration = true;
+        for (int i = 0; i < yWallPrefabs.Length; ++i) {
+            if (yWallPrefabs[i] == null) {
+                Debug.LogError("Y wall prefab #" + i + " not set.");
+                invalidConfiguration = true;
+            }
         }
 
         // and the row/column count
