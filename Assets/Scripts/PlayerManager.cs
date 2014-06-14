@@ -36,8 +36,11 @@ public class PlayerManager : MonoBehaviour {
 
 		ItemManager[] itemsCollected = collision.gameObject.GetComponents <ItemManager> ();
 
-		this.currentItemAction = itemsCollected [0].Action ();
-		Destroy (collision.gameObject);
+		if (itemsCollected.Length > 0) {
+			this.currentItemAction = itemsCollected [0].Action ();
+			Destroy (collision.gameObject);
+			}
+
 	}
 
 
