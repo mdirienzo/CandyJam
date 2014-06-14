@@ -66,8 +66,8 @@ public class LevelManager : MonoBehaviour {
         System.Random rnd = new System.Random();
 
         // create the map now that the configuration is validated
-        for (int r = 0; r < rows; ++r) {
-            for (int c = 0; c < columns; ++c) {
+        for (int r = 0; r < this.rows; ++r) {
+            for (int c = 0; c < this.columns; ++c) {
                 GameObject floorPrefab = this.floorPrefabs[rnd.Next(floorPrefabs.Length)];
                 Instantiate(floorPrefab, this.CenterOfTile(r, c), Quaternion.identity);
             }
@@ -84,10 +84,17 @@ public class LevelManager : MonoBehaviour {
         */
 
         for (int r = 0; r < rows; ++r) {
-
+            Vector3 southWallPosition = this.CenterOfWall(r, 0, TileSide.SOUTH);
+            Instantiate(this.xClipWallPrefab, southWallPosition, Quaternion.identity);
+            Vector3 northWallPosition = this.CenterOfWall(r, this.rows, TileSide.NORTH);
+            Instantiate(this.xClipWallPrefab, northWallPosition, Quaternion.identity);
         }
 
         for (int c = 0; c < columns; ++c) {
+            Vector3 westWallPosition = this.CenterOfWall(0, c, TileSide.WEST);
+            Instantiate(this.yClipWallPrefab, westWallPosition, Quaternion.identity);
+            Vector3 eastWallPosition = this.CenterOfWall(this.rows, c, TileSide.EAST);
+            Instantiate(this.yClipWallPrefab, eastWallPosition, Quaternion.identity);
         }
     }
 
