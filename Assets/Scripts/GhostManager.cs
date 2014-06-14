@@ -10,6 +10,10 @@ public class GhostManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		float highestThreat = 0;
+		foreach (GameObject obj in GameManager.instance.playerRefs) {
+//			obj.transform.position
+		}
+		
 	}
 }
