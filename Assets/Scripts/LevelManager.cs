@@ -39,6 +39,10 @@ public class LevelManager : MonoBehaviour {
 
 	void Update() { }
 
+    public Vector3 CenterOfMap() {
+        return this.CenterOfTile(this.rows / 2, this.columns / 2);
+    }
+
     public Vector3 CenterOfTile(int r, int c) {
         return new Vector3(c, r, 0);
     }
