@@ -12,4 +12,13 @@ public class TrapManager : MonoBehaviour {
 	void Update () {
 	
 	}
+
+
+	public void OnCollisionEnter(Collision collision) {
+		PlayerManager[] playersCollided = collision.gameObject.GetComponents <PlayerManager> ();
+
+		playersCollided [0].killPlayer ();
+
+		Destroy (collision.gameObject);
+	}
 }

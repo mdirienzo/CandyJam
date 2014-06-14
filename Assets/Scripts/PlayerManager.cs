@@ -29,10 +29,13 @@ public class PlayerManager : MonoBehaviour {
 		currentItemAction = null;
 	}
 
-	public void onCollisionEnter(Collision collision) {
+	public void OnCollisionEnter(Collision collision) {
 		Debug.Log ("COLLISION");
-		ItemManager[] items = collision.gameObject.GetComponents <ItemManager> ();
-		this.currentItemAction = items [0].Action ();
+
+
+		ItemManager[] itemsCollected = collision.gameObject.GetComponents <ItemManager> ();
+
+		this.currentItemAction = itemsCollected [0].Action ();
 		Destroy (collision.gameObject);
 	}
 
