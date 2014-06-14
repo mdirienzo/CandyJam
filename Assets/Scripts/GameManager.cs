@@ -4,7 +4,6 @@ using System.Collections;
 public class GameManager : MonoBehaviour {
 	public int numPlayers;
 	public GameObject playerPrefab;
-	public LevelManager levelManager;
 
 	public static GameManager instance;
 

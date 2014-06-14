@@ -2,11 +2,17 @@
 using System.Collections;
 
 public class LevelManager : MonoBehaviour {
+    public static LevelManager instance = null;
+
     public GameObject[] floorPrefabs;
     public GameObject[] xWallPrefabs;
     public GameObject[] yWallPrefabs;
     public int columns;
     public int rows;
+
+    void Awake() {
+        LevelManager.instance = this;
+    }
 
 	void Start() {
 		Debug.Log("LevelManager Start");
