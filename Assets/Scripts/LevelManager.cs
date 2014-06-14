@@ -4,8 +4,8 @@ using System.Collections;
 [System.Serializable]
 public class TileType {
     public GameObject floor;
-    public boolean hasNorthWall;
-    public boolean hasWestWall;
+    public bool hasNorthWall;
+    public bool hasWestWall;
 }
 
 public class LevelManager : MonoBehaviour {
