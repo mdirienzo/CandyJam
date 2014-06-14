@@ -98,6 +98,8 @@ public class LevelManager : MonoBehaviour {
             Object trap = Instantiate(trapPrefab, this.CenterOfTile(r, c), Quaternion.identity);
         }
 
+        // create
+
         /*
             GameObject wallPrefab = this.yWallPrefabs[rnd.Next(yWallPrefabs.Length)];
             Vector3 wallPosition = floorPosition + new Vector3(-0.5f, 0.0f, 0.0f);
@@ -108,12 +110,13 @@ public class LevelManager : MonoBehaviour {
             Instantiate(wallPrefab, wallPosition, Quaternion.identity);
         */
 
+        // create outside clipping walls
         for (int r = 0; r < rows; ++r) {
             Vector3 westWallPosition = this.CenterOfWall(r, 0, TileSide.WEST);
             Object westWall = Instantiate(this.yClipWallPrefab, westWallPosition, Quaternion.identity);
             westWall.name = "West wall " + r;
 
-            Vector3 eastWallPosition = this.CenterOfWall(r, this.columns, TileSide.EAST);
+            Vector3 eastWallPosition = this.CenterOfWall(r, this.columns-1, TileSide.EAST);
             Object eastWall = Instantiate(this.yClipWallPrefab, eastWallPosition, Quaternion.identity);
             eastWall.name = "East wall " + r;
         }
@@ -123,7 +126,7 @@ public class LevelManager : MonoBehaviour {
             Object southWall = Instantiate(this.xClipWallPrefab, southWallPosition, Quaternion.identity);
             southWall.name = "South wall " + c;
 
-            Vector3 northWallPosition = this.CenterOfWall(this.rows, c, TileSide.NORTH);
+            Vector3 northWallPosition = this.CenterOfWall(this.rows-1, c, TileSide.NORTH);
             Object northWall = Instantiate(this.xClipWallPrefab, northWallPosition, Quaternion.identity);
             northWall.name = "North wall " + c;
 
