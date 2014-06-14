@@ -2,11 +2,9 @@
 using System.Collections;
 
 public class GameManager : MonoBehaviour {
-	public numPlayers;
+	public int numPlayers;
 	public GameObject playerPrefab;
-
-
-    public LevelManager levelManager;
+	public LevelManager levelManager;
 
 	// Use this for initialization
 	void Start () {
@@ -18,6 +16,7 @@ public class GameManager : MonoBehaviour {
 		} else {
 
 			Debug.Log ("Spawning " + numPlayers + " players!");
+
 
 		}
 
