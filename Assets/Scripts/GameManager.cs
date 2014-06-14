@@ -6,6 +6,20 @@ public class GameManager : MonoBehaviour {
 	public GameObject playerPrefab;
 	public LevelManager levelManager;
 
+	public static GameManager instance;
+
+	private GameObject[] playerRefs;
+
+	void Awake(){
+
+		if (instance == null) {
+				instance = this;
+		} else {
+				Debug.Log ("Only one copy of gamemanager allowed!");
+		}
+	}
+
+
 	// Use this for initialization
 	void Start () {
 
@@ -16,9 +30,18 @@ public class GameManager : MonoBehaviour {
 		} else {
 
 			Debug.Log ("Spawning " + numPlayers + " players!");
+			//spawn players based on size of map
 
+			playerRefs = new GameObject[numPlayers];
+
+			for(int i = 0; i < numPlayers; i++){
+				playerRefs[i] = Instantiate(playerPrefab) as GameObject;
+				//playerRefs[i].transform.position = new Vector3(levelMan
+			}
 
 		}
+
+
 
 	}
 
