@@ -119,6 +119,6 @@ public class LevelManager : MonoBehaviour {
             invalidConfiguration = true;
         }
 
-        return invalidConfiguration;
+        return !invalidConfiguration;
     }
 }
