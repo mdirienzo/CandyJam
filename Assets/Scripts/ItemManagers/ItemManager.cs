@@ -5,7 +5,7 @@ public class Item {
 	public GameObject itemPrefab;
 }
 
-public class ItemManager : MonoBehaviour {
+public abstract class ItemManager : MonoBehaviour {
 	public enum ItemType { Lamp, Key };
 	public ItemType itemType;
 
@@ -19,10 +19,10 @@ public class ItemManager : MonoBehaviour {
 	
 	}
 
-	void Instantiate () {
+	public abstract ItemAction Action ();
+}
 
-	}
-
+public class ItemAction {
 	void doActivePower () {
 
 	}

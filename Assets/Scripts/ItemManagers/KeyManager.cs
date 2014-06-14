@@ -2,7 +2,11 @@
 using System.Collections;
 
 public class KeyManager : ItemManager {
-	
+	override public ItemAction Action() { return new LampAction(); }
+}
+
+
+public class KeyAction : ItemAction {
 	void doActivePower () {
 		
 	}
@@ -10,5 +14,5 @@ public class KeyManager : ItemManager {
 	void doPassivePower () {
 		
 	}
-
 }
+
