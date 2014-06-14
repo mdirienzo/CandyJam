@@ -51,20 +51,10 @@ public class InputController : MonoBehaviour {
 	}
 
 
-	void OnCollisionStay(Collision collisionInfo){
+	void OnTriggerEnter(Collider collider){
 
-	/*	foreach (GameObject gameobject in collisionInfo) {
-			Debug.Log ("Collided with " + gameobject);
-		}*/
-			if (collisionInfo.gameObject.tag == "Wall") {
-
-
-
-						/*igidbody.angularVelocity = new Vector3(0,0,0);
-			rigidbody.velocity = new Vector3(0,0,0);
-		}*/
-
-						Debug.Log ("Collided with " + collisionInfo);
-				}
+		if (collider.gameObject.tag == "Wall") {
+			Debug.Log ("Collided with " + collider.gameObject.tag);
+		}
 	}
 }
