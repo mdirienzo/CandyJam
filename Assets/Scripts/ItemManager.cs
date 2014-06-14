@@ -3,7 +3,6 @@ using System.Collections;
 
 public class Item {
 	public GameObject itemPrefab;
-
 }
 
 
@@ -20,5 +19,10 @@ public class ItemManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
+	}
+
+
+	void doPower () {
+
 	}
 }
