@@ -12,4 +12,13 @@ public class PlayerManager : MonoBehaviour {
 	void Update () {
 	
 	}
+
+
+	public void SetPlayerPower (ItemManager item) {
+		Debug.Log ("SetPlayerPower called with " + item.itemType);
+	}
+
+	public void SetPlayerItem (ItemManager item) {
+		Debug.Log ("SetPlayerPower called with " + item.itemType);
+	}
 }
