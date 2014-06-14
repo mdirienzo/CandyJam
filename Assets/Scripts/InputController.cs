@@ -26,6 +26,17 @@ public class InputController : MonoBehaviour {
 				rigidbody.AddForce (Vector3.left * movementSpeed * -Input.GetAxis("Horizontal"),ForceMode.Force);
 			}
 
+
+			if(Input.GetAxis("Vertical") > 0){
+				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
+				rigidbody.AddForce (Vector3.up * movementSpeed * Input.GetAxis("Vertical"),ForceMode.Force);
+			}
+			
+			if(Input.GetAxis("Vertical") < 0){
+				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
+				rigidbody.AddForce (Vector3.down * movementSpeed * -Input.GetAxis("Vertical"),ForceMode.Force);
+			}
+
 			if(Input.GetAxis("Horizontal") < 0){
 				//transform.Translate (Vector3.left * movementSpeed * -Input.GetAxis("Horizontal"));
 			}
