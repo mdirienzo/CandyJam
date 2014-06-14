@@ -2,9 +2,23 @@
 using System.Collections;
 
 public class GameManager : MonoBehaviour {
+	public numPlayers;
+	public GameObject playerPrefab;
+
 
 	// Use this for initialization
 	void Start () {
+
+		if (playerPrefab == null) 
+		{
+			Debug.LogError ("Player prefab not set!");
+		} else {
+
+			Debug.Log ("Spawning " + numPlayers + " players!");
+
+		}
+
+	
 	
 	}
 	
