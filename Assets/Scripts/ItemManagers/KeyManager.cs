@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LampManager : ItemManager {
+public class KeyManager : ItemManager {
 	override public ItemAction Action() { return new LampAction(); }
 }
 
-public class LampAction : ItemAction {
+
+public class KeyAction : ItemAction {
 	void doActivePower () {
 		
 	}
@@ -14,3 +15,4 @@ public class LampAction : ItemAction {
 		
 	}
 }
+

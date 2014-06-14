@@ -3,37 +3,46 @@ using System.Collections;
 
 public class PlayerManager : MonoBehaviour {
 	
-	private ItemManager currentItem;
+	private ItemAction currentItemAction = null;
 	private float lightRadius;
+	public bool isAlive;
 
 	// Use this for initialization
 	void Start () {
-		currentItem = new ItemManager();
-		//currentItem = new ItemManager();
 		lightRadius = 50;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (currentItem is LampManager) {
+		if (currentItemAction is LampAction) {
 			lightRadius = 150;
 		}
 	}
 
-	public void dropItem (){
-		// drop item on the ground or destroy it.
-		currentItem = null;
+	public void killPlayer () {
+		isAlive = false;
+		// play death animation and scream.
 	}
 
-	public void onCollisionEnter(Collision collision) {
+	public void dropItem (){
+		// drop item on the ground or destroy it.
+		currentItemAction = null;
+	}
+
+	public void OnCollisionEnter(Collision collision) {
 		Debug.Log ("COLLISION");
+
+
+		ItemManager[] itemsCollected = collision.gameObject.GetComponents <ItemManager> ();
+
+		this.currentItemAction = itemsCollected [0].Action ();
 		Destroy (collision.gameObject);
 	}
 
 
-	public void SetPlayerItem (ItemManager item) {
-		this.currentItem = item;
-		Debug.Log ("SetPlayerPower called with " + item);
+	public void SetPlayerItemAction (ItemAction itemAction) {
+		this.currentItemAction = itemAction;
+		Debug.Log ("SetPlayerPower called with " + itemAction);
 	}
 
 
