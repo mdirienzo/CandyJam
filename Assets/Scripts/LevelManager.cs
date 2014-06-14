@@ -9,6 +9,7 @@ public class LevelManager : MonoBehaviour {
         NORTH, EAST, SOUTH, WEST
     };
 
+    public GameObject borderPrefab;
     public GameObject[] floorPrefabs;
     public GameObject[] xWallPrefabs;
     public GameObject[] yWallPrefabs;
@@ -34,6 +35,7 @@ public class LevelManager : MonoBehaviour {
         }
 
         this.BuildMap();
+        this.PositionBorder();
         this.PositionCameraAndLight();
 	}
 
@@ -60,6 +62,10 @@ public class LevelManager : MonoBehaviour {
             default:
                 return Vector3.zero;
         }
+    }
+
+    public Vector3 ExtentsOfMap() {
+        return this.CenterOfTile(this.rows-1, this.columns-1) + new Vector3(0.5f, 0.5f, 0.0f);
     }
 
     private void BuildMap() {
@@ -98,72 +104,86 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
+    private void PositionBorder() {
+        Vector3 position = this.ExtentsOfMap() / 2.0f;
+        position.z = 5.0f;
+        GameObject borderObj = (GameObject)Instantiate(this.borderPrefab, Vector3.zero, Quaternion.identity);
+        borderObj.transform.localScale = this.ExtentsOfMap() + new Vector3(1.1f, 1.1f, 0.0f);
+        borderObj.transform.position = position;
+    }
+
     private void PositionCameraAndLight() {
-		// Compute the center of the board, subtracting 0.5 since each tile is 1.0x1.0 with the origin at the center
-		// The camera and light will be -5 Z above just to give plenty of room for walls and things
+        // Compute the center of the board, subtracting 0.5 since each tile is 1.0x1.0 with the origin at the center
+        // The camera and light will be -5 Z above just to give plenty of room for walls and things
         Vector3 center = new Vector3(columns / 2.0f - 0.5f, rows / 2.0f - 0.5f, -5.0f);
 
-		// Reposition the camera at the location we want
+        // Reposition the camera at the location we want
         GameObject mainCameraObj = GameObject.FindWithTag("MainCamera");
         mainCameraObj.transform.position = center;
 
-		// Set the ortho size (which is half the vertical) to the total vertical height plus a fudge
-		// hope that nobody runs with a portrait orientation, because this won't deal with it
-		Camera mainCamera = mainCameraObj.GetComponent<Camera>();
-		mainCamera.orthographicSize = rows / 2.0f + 0.25f /* nudge to give a little border at the top and bottom */;
+        // Set the ortho size (which is half the vertical) to the total vertical height plus a fudge
+        // hope that nobody runs with a portrait orientation, because this won't deal with it
+        Camera mainCamera = mainCameraObj.GetComponent<Camera>();
+        mainCamera.orthographicSize = rows / 2.0f + 0.25f /* nudge to give a little border at the top and bottom */;
 
-		GameObject sunObj = GameObject.FindWithTag("Sun");
+        GameObject sunObj = GameObject.FindWithTag("Sun");
         sunObj.transform.position = center;
     }
 
     private bool ValidateConfiguration() {
         bool invalidConfiguration = false;
 
+        // validate border prefab
+        if (this.borderPrefab == null) {
+            Debug.LogError("No border prefab set.");
+            invalidConfiguration = true;
+        }
+
         // validate floor prefabs
-        if (floorPrefabs.Length == 0) {
+        if (this.floorPrefabs.Length == 0) {
             Debug.LogError("No floor prefabs set.");
             invalidConfiguration = true;
         }
 
 
-        for (int i = 0; i < floorPrefabs.Length; ++i) {
-            if (floorPrefabs[i] == null) {
+        for (int i = 0; i < this.floorPrefabs.Length; ++i) {
+            if (this.floorPrefabs[i] == null) {
                 Debug.LogError("Floor prefab #" + i + " not set.");
                 invalidConfiguration = true;
             }
         }
 
         // and the wall prefabs
-        if (xWallPrefabs.Length == 0) {
+        if (this.xWallPrefabs.Length == 0) {
             Debug.LogError("X wall prefabs not set.");
             invalidConfiguration = true;
         }
 
-        for (int i = 0; i < xWallPrefabs.Length; ++i) {
-            if (xWallPrefabs[i] == null) {
+        for (int i = 0; i < this.xWallPrefabs.Length; ++i) {
+            if (this.xWallPrefabs[i] == null) {
                 Debug.LogError("X wall prefab #" + i + " not set.");
                 invalidConfiguration = true;
             }
         }
 
-        if (yWallPrefabs.Length == 0) {
+        if (this.yWallPrefabs.Length == 0) {
             Debug.LogError("Y wall prefab not set.");
             invalidConfiguration = true;
         }
 
-        for (int i = 0; i < yWallPrefabs.Length; ++i) {
-            if (yWallPrefabs[i] == null) {
+        for (int i = 0; i < this.yWallPrefabs.Length; ++i) {
+            if (this.yWallPrefabs[i] == null) {
                 Debug.LogError("Y wall prefab #" + i + " not set.");
                 invalidConfiguration = true;
             }
         }
 
         // and the row/column count
-        if (rows <= 0) {
+        if (this.rows <= 0) {
             Debug.LogError("Invalid row count.");
             invalidConfiguration = true;
         }
-        if (columns <= 0) {
+        if (this.columns <= 0) {
             Debug.LogError("Invalid column count.");
             invalidConfiguration = true;
         }
