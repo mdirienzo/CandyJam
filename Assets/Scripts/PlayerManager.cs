@@ -17,6 +17,11 @@ public class PlayerManager : MonoBehaviour {
 	
 	}
 
+	public void onCollisionEnter(Collision collision) {
+		Debug.Log ("COLLISION");
+		Destroy (collision.gameObject);
+	}
+
 
 	public void SetPlayerPower (ItemManager item) {
 		this.currentPower = item;

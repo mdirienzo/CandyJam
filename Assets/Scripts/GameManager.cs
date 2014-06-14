@@ -6,8 +6,11 @@ public class GameManager : MonoBehaviour {
 	public GameObject playerPrefab;
 
 
+    public LevelManager levelManager;
+
 	// Use this for initialization
 	void Start () {
+
 
 		if (playerPrefab == null) 
 		{
@@ -18,13 +21,11 @@ public class GameManager : MonoBehaviour {
 
 		}
 
-	
-	
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
-	
+
 	}
 
 
@@ -32,13 +33,13 @@ public class GameManager : MonoBehaviour {
 
 	// User picks up an item
 	void PlayerPicksUpItemHandler(PlayerManager player, ItemManager item) {
-		switch (item.itemType) {
-			case ItemManager.ItemType.POWER_TYPE:
-				player.SetPlayerPower (item);
-				break;
-			case ItemManager.ItemType.ITEM_TYPE:
-				player.SetPlayerItem (item);
-				break;
-		}
+//		switch (item.itemType) {
+//			case ItemManager.ItemType.POWER_TYPE:
+//				player.SetPlayerPower (item);
+//				break;
+//			case ItemManager.ItemType.ITEM_TYPE:
+//				player.SetPlayerItem (item);
+//				break;
+//		}
 	}
 }
