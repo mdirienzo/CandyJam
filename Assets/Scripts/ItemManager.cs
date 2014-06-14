@@ -10,8 +10,8 @@ public class Item {
 
 public class ItemManager : MonoBehaviour {
 
-	public enum ItemType { POWER_TYPE, ITEM_TYPE };
-	public ItemType itemType;
+//	public enum ItemType { POWER_TYPE, ITEM_TYPE };
+//	public ItemType itemType;
 
 	// Use this for initialization
 	void Start () {

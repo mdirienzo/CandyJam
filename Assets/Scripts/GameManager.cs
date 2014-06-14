@@ -18,13 +18,13 @@ public class GameManager : MonoBehaviour {
 
 	// User picks up an item
 	void PlayerPicksUpItemHandler(PlayerManager player, ItemManager item) {
-		switch (item.itemType) {
-			case ItemManager.ItemType.POWER_TYPE:
-				player.SetPlayerPower (item);
-				break;
-			case ItemManager.ItemType.ITEM_TYPE:
-				player.SetPlayerItem (item);
-				break;
-		}
+//		switch (item.itemType) {
+//			case ItemManager.ItemType.POWER_TYPE:
+//				player.SetPlayerPower (item);
+//				break;
+//			case ItemManager.ItemType.ITEM_TYPE:
+//				player.SetPlayerItem (item);
+//				break;
+//		}
 	}
 }
