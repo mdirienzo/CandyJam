@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour {
 
 	public static GameManager instance;
 
-	private GameObject[] playerRefs;
+	public GameObject[] playerRefs;
 
 	void Awake(){
 
