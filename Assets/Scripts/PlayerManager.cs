@@ -5,6 +5,7 @@ public class PlayerManager : MonoBehaviour {
 	
 	private ItemManager currentItem;
 	private float lightRadius;
+	public bool isAlive;
 
 	// Use this for initialization
 	void Start () {
@@ -19,6 +20,11 @@ public class PlayerManager : MonoBehaviour {
 		}
 	}
 
+	public void killPlayer () {
+		isAlive = false;
+		// play death animation and scream.
+	}
+
 	public void dropItem (){
 		// drop item on the ground or destroy it.
 		currentItem = null;
@@ -26,6 +32,7 @@ public class PlayerManager : MonoBehaviour {
 
 	public void onCollisionEnter(Collision collision) {
 		Debug.Log ("COLLISION");
+		ItemManager[] items = collision.gameObject.GetComponents <ItemManager> ();
 		Destroy (collision.gameObject);
 	}
 
