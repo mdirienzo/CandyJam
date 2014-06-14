@@ -5,10 +5,8 @@ public class Item {
 	public GameObject itemPrefab;
 }
 
-
-
 public class ItemManager : MonoBehaviour {
-	public enum ItemType { POWER_TYPE, ITEM_TYPE };
+	public enum ItemType { Lamp, Key };
 	public ItemType itemType;
 
 	// Use this for initialization
@@ -21,8 +19,18 @@ public class ItemManager : MonoBehaviour {
 	
 	}
 
-
-	void doPower () {
+	void Instantiate () {
 
 	}
+
+	void doActivePower () {
+
+	}
+
+	void doPassivePower () {
+		
+	}
+
 }
+
+
