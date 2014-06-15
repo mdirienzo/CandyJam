@@ -17,7 +17,7 @@ public class LevelManager : MonoBehaviour {
     public int columns;
     public int rows;
 
-    private BoundedTiles tiles;
+    public BoundedTiles tiles;
     private GameObject xClipWallPrefab = null;
     private GameObject yClipWallPrefab = null;
 
@@ -173,6 +173,9 @@ public class LevelManager : MonoBehaviour {
 
         GameObject sunObj = GameObject.FindWithTag("Sun");
         sunObj.transform.position = center;
+
+        GameObject lightningObj = GameObject.FindWithTag("Lightning");
+        lightningObj.transform.position = center;
     }
 
     private bool validateConfiguration() {
