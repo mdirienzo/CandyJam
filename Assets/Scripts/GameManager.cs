@@ -9,13 +9,13 @@ public class GameManager : MonoBehaviour {
 
 	public GameObject[] playerRefs;
 
-
 	// Game Control Variables
-	private float timeUntilDarkness = 15;
+	private float theDarkTime = 15;
 	private float startTime;
+    private GameObject sun;
+    private float sunRotation = 0.0f;
 
-	void Awake(){
-
+	void Awake() {
 		if (instance == null) {
 				instance = this;
 		} else {
@@ -25,14 +25,12 @@ public class GameManager : MonoBehaviour {
 
 
 	// Use this for initialization
-	void Start () {
-
+	void Start() {
+        this.sun = GameObject.FindWithTag("Sun");
 		startTime = Time.time;
-		if (playerPrefab == null)
-		{
+		if (playerPrefab == null) {
 			Debug.LogError ("Player prefab not set!");
 		} else {
-
 			if(numPlayers < 1){
 				Debug.LogError ("Players = 0! :(");
 			}else{
@@ -43,23 +41,26 @@ public class GameManager : MonoBehaviour {
 
 				for(int i = 0; i < numPlayers; i++){
 					playerRefs[i] = Instantiate(playerPrefab) as GameObject;
-					playerRefs[i].transform.position = LevelManager.instance.centerOfMap();
+					playerRefs[i].transform.position = LevelManager.instance.centerOfMap;
 					//playerRefs[i].transform.position+= (Vector3.back);
 				}
 			}
-
-
 		}
-
-
-
 	}
-
-
 
 	// Update is called once per frame
 	void Update () {
-		if ((Time.time - startTime) > timeUntilDarkness) {
+        float timeElapsed = Time.time - startTime;
+        float leftUntilDark = theDarkTime - timeElapsed;
+
+        if (leftUntilDark < theDarkTime / 2.0f && leftUntilDark > 0.0f) {
+            float r = -110.0f * (1.0f - leftUntilDark / (theDarkTime / 2.0f));
+            float dr = r - sunRotation;
+            sunRotation = r;
+            sun.transform.RotateAround(LevelManager.instance.trueCenterOfMap, Vector3.up, dr);
+        }
+
+        if (leftUntilDark < 0.0f && false /* we have not en-dark-ened yet */) {
 			// Enter darkness mode
 		}
 	}
