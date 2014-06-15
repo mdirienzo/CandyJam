@@ -6,6 +6,9 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour {
 	public int numPlayers;
 	public GameObject playerPrefab;
+    public GameObject doorPrefab;
+    public Material closedDoorMaterial;
+    public Material openDoorMaterial;
 
 	public static GameManager instance;
 
@@ -20,16 +23,30 @@ public class GameManager : MonoBehaviour {
     private float sunRotation = 0.0f;
 
     public bool isDark = false;
+    public bool isDoorOpen = false;
     public float timeUntilDark = 15;
 
 	void Awake() {
-		if (instance == null) {
-				instance = this;
-		} else {
-				Debug.Log ("Only one copy of gamemanager allowed!");
-		}
+
 
 		List<GameObject> playerRefs = new List<GameObject> ();
+
+        if (instance == null) {
+            instance = this;
+        } else {
+            Debug.LogError("Only one copy of gamemanager allowed!");
+        }
+
+        if (this.doorPrefab == null) {
+            Debug.LogError("No door prefab!");
+        }
+        if (this.closedDoorMaterial == null) {
+            Debug.LogError("no closed door material!");
+        }
+        if (this.openDoorMaterial == null) {
+            Debug.LogError("no open door material!");
+        }
+
 	}
 
 
@@ -89,6 +106,11 @@ public class GameManager : MonoBehaviour {
             float dr = r - sunRotation;
             sunRotation = r;
             sun.transform.RotateAround(LevelManager.instance.trueCenterOfMap, Vector3.up, dr);
+
+            float playerLightIntensity = 0.3f * (1.0f - this.timeUntilDark / (theDarkTime / 2.0f));
+            foreach (GameObject light in GameObject.FindGameObjectsWithTag("PlayerLight")) {
+                light.GetComponent<Light>().intensity = playerLightIntensity;
+            }
         }
 
         if (this.timeUntilDark < 0.0f && !this.isDark) {
@@ -142,8 +164,32 @@ public class GameManager : MonoBehaviour {
     }
 
     void placeDoor() {
+        LevelManager level = LevelManager.instance;
+        CardinalDir side = (CardinalDir)RNG.random.Next(4);
+        TileLocation loc;
+        Quaternion rot = Quaternion.identity;
+        Vector3 scale = Vector3.one;
+        switch (side) {
+            case CardinalDir.NORTH: loc = new TileLocation(level.tiles.bound.r-1, RNG.random.Next(level.tiles.bound.c)); rot.eulerAngles = new Vector3(0.0f, 0.0f, 90.0f); scale.y = -1.0f; break;
+            case CardinalDir.EAST:  loc = new TileLocation(RNG.random.Next(level.tiles.bound.r), level.tiles.bound.c-1); scale.x = -1.0f; break;
+            case CardinalDir.SOUTH: loc = new TileLocation(level.tiles.bound.r-1, RNG.random.Next(level.tiles.bound.c)); rot.eulerAngles = new Vector3(0.0f, 0.0f, 90.0f); break;
+            default:                loc = new TileLocation(RNG.random.Next(level.tiles.bound.r), level.tiles.bound.c-1); break;
+        }
+
+        Instantiate(this.doorPrefab, level.centerOfTile(loc), rot);
+        this.closeDoor();
+        this.Invoke("closeDoor", 10.0f);
     }
 
+    void openDoor() {
+        this.isDoorOpen = true;
+        GameObject.FindWithTag("Door").GetComponent<MeshRenderer>().material = this.openDoorMaterial;
+    }
+
+    void closeDoor() {
+        this.isDoorOpen = false;
+        GameObject.FindWithTag("Door").GetComponent<MeshRenderer>().material = this.closedDoorMaterial;
+    }
 
 	void PlayerPicksUpKeyItem () {
 
