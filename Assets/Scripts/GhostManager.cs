@@ -20,7 +20,7 @@ public class GhostManager : MonoBehaviour {
 			}
 
 		}
-		this.transform.position = Vector3.MoveTowards (this.transform.position, currentTarget.transform.position, (highestThreat * .10f) + 10f);
+		//this.transform.position = Vector3.MoveTowards (this.transform.position, currentTarget.transform.position, (highestThreat * .10f) + 10f);
 //		Vector3 direction = (currentTarget.transform.position - this.gameObject.transform.position).Normalize + ((distance * .10) + 10);
 //		this.gameObject. += direction;
 	}

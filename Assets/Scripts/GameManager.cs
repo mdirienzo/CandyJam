@@ -5,6 +5,9 @@ using System.Collections;
 public class GameManager : MonoBehaviour {
 	public int numPlayers;
 	public GameObject playerPrefab;
+    public GameObject doorPrefab;
+    public Material closedDoorMaterial;
+    public Material openDoorMaterial;
 
 	public static GameManager instance;
 
@@ -19,13 +22,24 @@ public class GameManager : MonoBehaviour {
     private float sunRotation = 0.0f;
 
     public bool isDark = false;
+    public bool isDoorOpen = false;
     public float timeUntilDark = 15;
 
 	void Awake() {
+        if (this.doorPrefab == null) {
+            Debug.LogError("No door prefab!");
+        }
+        if (this.closedDoorMaterial == null) {
+            Debug.LogError("no closed door material!");
+        }
+        if (this.openDoorMaterial == null) {
+            Debug.LogError("no open door material!");
+        }
+
 		if (instance == null) {
-				instance = this;
+			instance = this;
 		} else {
-				Debug.Log ("Only one copy of gamemanager allowed!");
+			Debug.LogError("Only one copy of gamemanager allowed!");
 		}
 	}
 
@@ -137,8 +151,32 @@ public class GameManager : MonoBehaviour {
     }
 
     void placeDoor() {
+        LevelManager level = LevelManager.instance;
+        CardinalDir side = (CardinalDir)RNG.random.Next(4);
+        TileLocation loc;
+        Quaternion rot = Quaternion.identity;
+        Vector3 scale = Vector3.one;
+        switch (side) {
+            case CardinalDir.NORTH: loc = new TileLocation(level.tiles.bound.r-1, RNG.random.Next(level.tiles.bound.c)); rot.eulerAngles = new Vector3(0.0f, 0.0f, 90.0f); scale.y = -1.0f; break;
+            case CardinalDir.EAST:  loc = new TileLocation(RNG.random.Next(level.tiles.bound.r), level.tiles.bound.c-1); scale.x = -1.0f; break;
+            case CardinalDir.SOUTH: loc = new TileLocation(level.tiles.bound.r-1, RNG.random.Next(level.tiles.bound.c)); rot.eulerAngles = new Vector3(0.0f, 0.0f, 90.0f); break;
+            default:                loc = new TileLocation(RNG.random.Next(level.tiles.bound.r), level.tiles.bound.c-1); break;
+        }
+
+        Instantiate(this.doorPrefab, level.centerOfWall(loc, side), rot);
+        this.closeDoor();
+        this.Invoke("closeDoor", 10.0f);
     }
 
+    void openDoor() {
+        this.isDoorOpen = true;
+        GameObject.FindWithTag("Door").GetComponent<MeshRenderer>().material = this.openDoorMaterial;
+    }
+
+    void closeDoor() {
+        this.isDoorOpen = false;
+        GameObject.FindWithTag("Door").GetComponent<MeshRenderer>().material = this.closedDoorMaterial;
+    }
 
 	void PlayerPicksUpKeyItem () {
 

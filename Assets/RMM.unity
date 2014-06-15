@@ -408,8 +408,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numPlayers: 1
   playerPrefab: {fileID: 100002, guid: ce0764a516499a346bd4043dfab3c965, type: 2}
+  doorPrefab: {fileID: 100000, guid: ad02db44c9a2c425d8bc2758a056a72c, type: 2}
+  closedDoorMaterial: {fileID: 2100000, guid: 9b0486b4b5dcd4edb9ea6a3f3bdc96f8, type: 2}
+  openDoorMaterial: {fileID: 2100000, guid: 3d152977f996c4071a0a9fd140a9e7e4, type: 2}
   playerRefs: []
   isDark: 0
+  isDoorOpen: 0
   timeUntilDark: 15
 --- !u!4 &2039978338
 Transform:
