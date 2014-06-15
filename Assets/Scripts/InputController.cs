@@ -26,23 +26,35 @@ public class InputController : MonoBehaviour {
 				isMoving = true;
 		}
 		anim.SetBool ("IsMoving", isMoving);
-		anim.SetFloat ("HorizontalSpeed", Input.GetAxis ("Horizontal"));
+		anim.SetBool ("HorizontalPressed", false);
+
+		//anim.SetFloat ("VerticalSpeed", Mathf.Abs (Input.GetAxis ("Vertical")));
+		
 		anim.SetFloat ("VerticalSpeed", Input.GetAxis ("Vertical"));
-//		string[] inputs = Input.GetJoystickNames();
-//		foreach (string input in inputs) {
-//			Debug.Log (input);
-//		}
-		Debug.Log(Input.GetAxis(axisName + "Horizontal"));
+
+
+			//anim.SetFloat ("VerticalSpeed", Input.GetAxis ("Vertical"));
+			//anim.SetFloat ("HorizontalSpeed", Mathf.Abs(Input.GetAxis ("Horizontal")));
+		//if(Mathf.Abs(Input.GetAxis ("Vertical")) < (Mathf.Abs(Input.GetAxis ("Horizontal")))){
+		anim.SetFloat ("HorizontalSpeed", Mathf.Abs(Input.GetAxis ("Horizontal")));
+			//anim.SetFloat ("VerticalSpeed", Input.GetAxis ("Vertical"));
+		//} 	
+
+
 		if (isMovable) {
 			if(Input.GetAxis(axisName + "Horizontal") > 0){
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
 				rigidbody.AddForce (Vector3.right * movementSpeed * Input.GetAxis(axisName + "Horizontal"),ForceMode.Force);
+				transform.localScale = new Vector3(1,1,1);
+				anim.SetBool ("HorizontalPressed", true);
 
 			}
 
 			if(Input.GetAxis(axisName + "Horizontal") < 0){
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
 				rigidbody.AddForce (Vector3.left * movementSpeed * -Input.GetAxis(axisName + "Horizontal"),ForceMode.Force);
+				transform.localScale = new Vector3(-1,1,1);
+				anim.SetBool ("HorizontalPressed", true);
 			}
 
 
@@ -68,6 +80,11 @@ public class InputController : MonoBehaviour {
 
 			if(rigidbody.velocity.magnitude > maxVelocity){
 				rigidbody.velocity = rigidbody.velocity.normalized * maxVelocity;
+			}
+
+			if(rigidbody.velocity.magnitude == 0){
+				Debug.Log ("magnitude 0");
+				anim.StopPlayback();
 			}
 			                                 
 		}
