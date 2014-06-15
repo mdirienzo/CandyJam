@@ -22,6 +22,7 @@ public class PlayerManager : MonoBehaviour {
 	public void killPlayer () {
 		Debug.Log ("DEADED");
 		isAlive = false;
+		Destroy (gameObject);
 		// play death animation and scream.
 	}
 

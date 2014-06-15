@@ -13,13 +13,24 @@ public class TrapManager : MonoBehaviour {
 	
 	}
 
-
+	/*
 	public void OnCollisionEnter(Collision collision) {
-		PlayerManager[] playersCollided = collision.gameObject.GetComponents <PlayerManager> ();
+		PlayerManager playerCollided = collision.gameObject.GetComponent <PlayerManager> ();
 		Debug.Log ("TRAPS");
-		if (playersCollided.Length > 0) {
+		Debug.Log ("Num players: " + playersCollided.Length);
+		//if (playersCollided.Length > 0) {
 			playersCollided [0].killPlayer ();
 			Destroy (collision.gameObject);
+		}
+
+	}*/
+
+	public void OnTriggerEnter(Collider otherObject){
+		if (otherObject.tag == "Player") {
+
+			//otherObject.GetComponent<PlayerManager>().killPlayer();
+			GameManager.instance.KillPlayer(otherObject.gameObject);
+			//Debug.Log ("other object tag is: " + otherObject.tag);
 		}
 
 	}

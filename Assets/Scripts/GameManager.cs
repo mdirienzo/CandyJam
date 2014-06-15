@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 	public int numPlayers;
@@ -8,7 +9,7 @@ public class GameManager : MonoBehaviour {
 
 	public static GameManager instance;
 
-	public GameObject[] playerRefs;
+	public List<GameObject> playerRefs;
 
 	// Game Control Variables
 	private float theDarkTime = 15;
@@ -27,6 +28,8 @@ public class GameManager : MonoBehaviour {
 		} else {
 				Debug.Log ("Only one copy of gamemanager allowed!");
 		}
+
+		List<GameObject> playerRefs = new List<GameObject> ();
 	}
 
 
@@ -55,11 +58,14 @@ public class GameManager : MonoBehaviour {
 				Debug.Log ("Spawning " + numPlayers + " players!");
 				//spawn players based on size of map
 
-				playerRefs = new GameObject[numPlayers];
+				//playerRefs = new GameObject[numPlayers];
 
 				for(int i = 0; i < numPlayers; i++){
-					playerRefs[i] = Instantiate(playerPrefab) as GameObject;
-					playerRefs[i].transform.position = LevelManager.instance.centerOfMap;
+					GameObject player = (GameObject)Instantiate(playerPrefab);
+					playerRefs.Add (player);
+
+					//playerRefs[i] = Instantiate(playerPrefab) as GameObject;
+					player.transform.position = LevelManager.instance.centerOfMap;
 					//playerRefs[i].transform.position+= (Vector3.back);
 				}
 			}
@@ -140,6 +146,22 @@ public class GameManager : MonoBehaviour {
 
 
 	void PlayerPicksUpKeyItem () {
+
+	}
+
+	public void KillPlayer(GameObject playerObject){
+
+		/*foreach (GameObject player in playerRefs) {
+			if(player == playerObject){
+				player = null;
+				Destroy(playerObject);
+			}
+		}*/
+
+		if (playerRefs.Remove (playerObject)) {
+			Destroy(playerObject);
+			Debug.Log ("Player Destroyed.");
+		};
 
 	}
 }
