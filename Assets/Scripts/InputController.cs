@@ -5,6 +5,7 @@ public class InputController : MonoBehaviour {
 
 	public float movementSpeed;
 	private bool isMovable = true;
+	private float maxVelocity = 2;
 
 	// Use this for initialization
 	void Start () {
@@ -15,7 +16,6 @@ public class InputController : MonoBehaviour {
 	void Update () {
 	
 		if (isMovable) {
-
 			if(Input.GetAxis("Horizontal") > 0){
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
 				rigidbody.AddForce (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"),ForceMode.Force);
@@ -45,6 +45,10 @@ public class InputController : MonoBehaviour {
 			}
 			if(Input.GetAxis("Vertical") < 0){
 				//transform.Translate (Vector3.down * movementSpeed * -Input.GetAxis("Vertical"));
+			}
+
+			if(rigidbody.velocity.magnitude > maxVelocity){
+				rigidbody.velocity = rigidbody.velocity.normalized * maxVelocity;
 			}
 			                                 
 		}
