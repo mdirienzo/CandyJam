@@ -80,6 +80,11 @@ public class InputController : MonoBehaviour {
 			if(rigidbody.velocity.magnitude > maxVelocity){
 				rigidbody.velocity = rigidbody.velocity.normalized * maxVelocity;
 			}
+
+			if(rigidbody.velocity.magnitude == 0){
+				Debug.Log ("magnitude 0");
+				anim.StopPlayback();
+			}
 			                                 
 		}
 	}
