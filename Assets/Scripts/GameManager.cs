@@ -107,6 +107,7 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 
+		keysRequired = numPlayers;
         LevelManager level = LevelManager.instance;
         TileLocation torchLoc;
         do { torchLoc = level.tiles.random(); }
