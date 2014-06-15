@@ -9,6 +9,11 @@ public class GameManager : MonoBehaviour {
 
 	public GameObject[] playerRefs;
 
+
+	// Game Control Variables
+	private float timeUntilDarkness = 15;
+	private float startTime;
+
 	void Awake(){
 
 		if (instance == null) {
@@ -22,7 +27,7 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-
+		startTime = Time.time;
 		if (playerPrefab == null)
 		{
 			Debug.LogError ("Player prefab not set!");
@@ -50,10 +55,17 @@ public class GameManager : MonoBehaviour {
 
 	}
 
+
+
 	// Update is called once per frame
 	void Update () {
-
+		if ((Time.time - startTime) > timeUntilDarkness) {
+			// Enter darkness mode
+		}
 	}
 
 
+	void PlayerPicksUpKeyItem () {
+
+	}
 }
