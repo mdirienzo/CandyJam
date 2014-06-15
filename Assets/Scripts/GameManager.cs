@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour {
 	public int numPlayers;
 	public GameObject playerPrefab;
     public GameObject doorPrefab;
+	public GameObject explodey;
     public Material closedDoorMaterial;
     public Material openDoorMaterial;
 
@@ -206,6 +207,7 @@ public class GameManager : MonoBehaviour {
 		}*/
 
 		if (playerRefs.Remove (playerObject)) {
+			Instantiate (explodey,playerObject.transform.position, explodey.transform.rotation);
 			Destroy(playerObject);
 			Debug.Log ("Player Destroyed.");
 		};
