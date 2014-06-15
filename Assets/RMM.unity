@@ -358,11 +358,9 @@ MonoBehaviour:
   - {fileID: 100000, guid: 6e2f79a77ba1e4ae6a4d841bde8add11, type: 2}
   - {fileID: 100000, guid: 41506c6b1c7b74622bbdecf0617c75ce, type: 2}
   xWallPrefabs:
-  - {fileID: 100000, guid: 43871f3d327f34dc3a244caee1850f40, type: 2}
-  - {fileID: 100000, guid: a0159e21d2ad046d990ae18c57d3f6d1, type: 2}
+  - {fileID: 100000, guid: 0943b0e2e3c994c3586c93ed052751f7, type: 2}
   yWallPrefabs:
-  - {fileID: 100000, guid: 675384b7870834a989a7647835a26308, type: 2}
-  - {fileID: 100000, guid: d4e409618c4ca4393853aa564d4c2c94, type: 2}
+  - {fileID: 100000, guid: ce520276965444513b7437157403bc09, type: 2}
   trapPrefabs:
   - {fileID: 100000, guid: 6a0627002ed0349da9f2b7000006ab9a, type: 2}
   columns: 10
