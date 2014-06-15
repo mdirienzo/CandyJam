@@ -30,17 +30,17 @@ public class InputController : MonoBehaviour {
 
 		//anim.SetFloat ("VerticalSpeed", Mathf.Abs (Input.GetAxis ("Vertical")));
 
-		anim.SetFloat ("VerticalSpeed", Input.GetAxis ("Vertical"));
+		anim.SetFloat ("VerticalSpeed", Input.GetAxis (axisName + "Vertical"));
 
 
 			//anim.SetFloat ("VerticalSpeed", Input.GetAxis ("Vertical"));
 			//anim.SetFloat ("HorizontalSpeed", Mathf.Abs(Input.GetAxis ("Horizontal")));
 		//if(Mathf.Abs(Input.GetAxis ("Vertical")) < (Mathf.Abs(Input.GetAxis ("Horizontal")))){
-		anim.SetFloat ("HorizontalSpeed", Mathf.Abs(Input.GetAxis ("Horizontal")));
+		anim.SetFloat ("HorizontalSpeed", Mathf.Abs(Input.GetAxis (axisName + "Horizontal")));
 			//anim.SetFloat ("VerticalSpeed", Input.GetAxis ("Vertical"));
 		//}
 
-
+		Debug.Log (Input.GetAxis(axisName + "Horizontal"));
 		if (isMovable) {
 			if(Input.GetAxis(axisName + "Horizontal") > 0){
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
@@ -62,13 +62,7 @@ public class InputController : MonoBehaviour {
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
 				rigidbody.AddForce (Vector3.up * movementSpeed * Input.GetAxis(axisName + "Vertical"),ForceMode.Force);
 			}
-<<<<<<< HEAD
-			
 			if(Input.GetAxis(axisName + "Vertical") < 0){
-=======
-
-			if(Input.GetAxis("Vertical") < 0){
->>>>>>> acad676876dfd2f9541ec0d322f9d74f750d3b89
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
 				rigidbody.AddForce (Vector3.down * movementSpeed * -Input.GetAxis(axisName + "Vertical"),ForceMode.Force);
 			}
