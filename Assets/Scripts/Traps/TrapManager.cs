@@ -16,7 +16,7 @@ public class TrapManager : MonoBehaviour {
 
 	public void OnCollisionEnter(Collision collision) {
 		PlayerManager[] playersCollided = collision.gameObject.GetComponents <PlayerManager> ();
-
+		Debug.Log ("TRAPS");
 		if (playersCollided.Length > 0) {
 			playersCollided [0].killPlayer ();
 			Destroy (collision.gameObject);
