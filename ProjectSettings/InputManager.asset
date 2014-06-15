@@ -69,7 +69,7 @@ InputManager:
     axis: 0
     joyNum: 4
   - serializedVersion: 3
-    m_Name: Vertical
+    m_Name: Player1_Vertical
     descriptiveName: 
     descriptiveNegativeName: 
     negativeButton: down
@@ -77,13 +77,61 @@ InputManager:
     altNegativeButton: s
     altPositiveButton: w
     gravity: 3
-    dead: .00100000005
-    sensitivity: 3
+    dead: .200000003
+    sensitivity: 1
     snap: 1
-    invert: 0
-    type: 0
-    axis: 0
-    joyNum: 0
+    invert: 1
+    type: 2
+    axis: 1
+    joyNum: 1
+  - serializedVersion: 3
+    m_Name: Player2_Vertical
+    descriptiveName: 
+    descriptiveNegativeName: 
+    negativeButton: down
+    positiveButton: up
+    altNegativeButton: s
+    altPositiveButton: w
+    gravity: 3
+    dead: .200000003
+    sensitivity: 1
+    snap: 1
+    invert: 1
+    type: 2
+    axis: 1
+    joyNum: 2
+  - serializedVersion: 3
+    m_Name: Player3_Vertical
+    descriptiveName: 
+    descriptiveNegativeName: 
+    negativeButton: down
+    positiveButton: up
+    altNegativeButton: s
+    altPositiveButton: w
+    gravity: 3
+    dead: .200000003
+    sensitivity: 1
+    snap: 1
+    invert: 1
+    type: 2
+    axis: 1
+    joyNum: 3
+  - serializedVersion: 3
+    m_Name: Player4_Vertical
+    descriptiveName: 
+    descriptiveNegativeName: 
+    negativeButton: down
+    positiveButton: up
+    altNegativeButton: s
+    altPositiveButton: w
+    gravity: 3
+    dead: .200000003
+    sensitivity: 1
+    snap: 1
+    invert: 1
+    type: 2
+    axis: 1
+    joyNum: 4
   - serializedVersion: 3
     m_Name: Fire1
     descriptiveName: 
@@ -213,7 +261,7 @@ InputManager:
     axis: 0
     joyNum: 0
   - serializedVersion: 3
-    m_Name: Player1_Vertical
+    m_Name: Vertical
     descriptiveName: 
     descriptiveNegativeName: 
     negativeButton: 
@@ -227,7 +275,7 @@ InputManager:
     invert: 1
     type: 0
     axis: 1
-    joyNum: 1
+    joyNum: 0
   - serializedVersion: 3
     m_Name: Fire1
     descriptiveName: 
