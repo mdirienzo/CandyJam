@@ -26,6 +26,12 @@ public class GameManager : MonoBehaviour {
     public float timeUntilDark = 15;
 
 	void Awake() {
+        if (instance == null) {
+            instance = this;
+        } else {
+            Debug.LogError("Only one copy of gamemanager allowed!");
+        }
+
         if (this.doorPrefab == null) {
             Debug.LogError("No door prefab!");
         }
@@ -35,12 +41,6 @@ public class GameManager : MonoBehaviour {
         if (this.openDoorMaterial == null) {
             Debug.LogError("no open door material!");
         }
-
-		if (instance == null) {
-			instance = this;
-		} else {
-			Debug.LogError("Only one copy of gamemanager allowed!");
-		}
 	}
 
 
@@ -98,6 +98,11 @@ public class GameManager : MonoBehaviour {
             float dr = r - sunRotation;
             sunRotation = r;
             sun.transform.RotateAround(LevelManager.instance.trueCenterOfMap, Vector3.up, dr);
+
+            float playerLightIntensity = 0.3f * (1.0f - this.timeUntilDark / (theDarkTime / 2.0f));
+            foreach (GameObject light in GameObject.FindGameObjectsWithTag("PlayerLight")) {
+                light.GetComponent<Light>().intensity = playerLightIntensity;
+            }
         }
 
         if (this.timeUntilDark < 0.0f && !this.isDark) {
@@ -163,7 +168,7 @@ public class GameManager : MonoBehaviour {
             default:                loc = new TileLocation(RNG.random.Next(level.tiles.bound.r), level.tiles.bound.c-1); break;
         }
 
-        Instantiate(this.doorPrefab, level.centerOfWall(loc, side), rot);
+        Instantiate(this.doorPrefab, level.centerOfTile(loc), rot);
         this.closeDoor();
         this.Invoke("closeDoor", 10.0f);
     }
