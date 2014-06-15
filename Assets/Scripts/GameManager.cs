@@ -239,11 +239,11 @@ public class GameManager : MonoBehaviour {
     public void doorTouched(GameObject player) {
         if (this.isDoorOpen) {
             this.winCondition = true;
-            this.KillPlayer(player);
+            this.RemovePlayer(player, false);
         }
     }
 
-	public void KillPlayer(GameObject playerObject){
+	public void RemovePlayer(GameObject playerObject, bool wasKilled){
 
 		/*foreach (GameObject player in playerRefs) {
 			if(player == playerObject){
@@ -253,7 +253,9 @@ public class GameManager : MonoBehaviour {
 		}*/
 
 		if (playerRefs.Remove (playerObject)) {
-			Instantiate (explodey,playerObject.transform.position, explodey.transform.rotation);
+			if ( wasKilled){
+				Instantiate (explodey,playerObject.transform.position, explodey.transform.rotation);
+			}
 			Destroy(playerObject);
 			Debug.Log ("Player Destroyed.");
 		}
