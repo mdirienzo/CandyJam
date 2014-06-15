@@ -28,7 +28,7 @@ public class TrapManager : MonoBehaviour {
 
     void OnTriggerEnter(Collider obj) {
         if (obj.gameObject.tag == "Player") {
-			GameManager.instance.KillPlayer(obj.gameObject);
+			GameManager.instance.RemovePlayer(obj.gameObject, true);
 		}
 	}
 }
