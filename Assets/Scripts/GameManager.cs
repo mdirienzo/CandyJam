@@ -44,8 +44,7 @@ public class GameManager : MonoBehaviour {
 
 				for(int i = 0; i < numPlayers; i++){
 					playerRefs[i] = Instantiate(playerPrefab) as GameObject;
-					playerRefs[i].transform.position = LevelManager.instance.centerOfMap();
-					playerRefs[i].GetComponent<InputController>().axisName = "joystick 0";
+//					playerRefs[i].GetComponent<InputController>().axisName = "Player1_";
 					playerRefs[i].transform.position = LevelManager.instance.centerOfMap;
 					//playerRefs[i].transform.position+= (Vector3.back);
 				}

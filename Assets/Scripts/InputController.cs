@@ -13,7 +13,7 @@ public class InputController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		axisName = "";
+		axisName = "Player1_";
 		anim = GetComponent<Animator> ();
 	}
 	
@@ -28,28 +28,32 @@ public class InputController : MonoBehaviour {
 		anim.SetBool ("IsMoving", isMoving);
 		anim.SetFloat ("HorizontalSpeed", Input.GetAxis ("Horizontal"));
 		anim.SetFloat ("VerticalSpeed", Input.GetAxis ("Vertical"));
-
+//		string[] inputs = Input.GetJoystickNames();
+//		foreach (string input in inputs) {
+//			Debug.Log (input);
+//		}
+		Debug.Log(Input.GetAxis(axisName + "Horizontal"));
 		if (isMovable) {
 			if(Input.GetAxis(axisName + "Horizontal") > 0){
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
-				rigidbody.AddForce (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"),ForceMode.Force);
+				rigidbody.AddForce (Vector3.right * movementSpeed * Input.GetAxis(axisName + "Horizontal"),ForceMode.Force);
 
 			}
 
 			if(Input.GetAxis(axisName + "Horizontal") < 0){
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
-				rigidbody.AddForce (Vector3.left * movementSpeed * -Input.GetAxis("Horizontal"),ForceMode.Force);
+				rigidbody.AddForce (Vector3.left * movementSpeed * -Input.GetAxis(axisName + "Horizontal"),ForceMode.Force);
 			}
 
 
 			if(Input.GetAxis(axisName + "Vertical") > 0){
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
-				rigidbody.AddForce (Vector3.up * movementSpeed * Input.GetAxis("Vertical"),ForceMode.Force);
+				rigidbody.AddForce (Vector3.up * movementSpeed * Input.GetAxis(axisName + "Vertical"),ForceMode.Force);
 			}
 			
 			if(Input.GetAxis(axisName + "Vertical") < 0){
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
-				rigidbody.AddForce (Vector3.down * movementSpeed * -Input.GetAxis("Vertical"),ForceMode.Force);
+				rigidbody.AddForce (Vector3.down * movementSpeed * -Input.GetAxis(axisName + "Vertical"),ForceMode.Force);
 			}
 
 			if(Input.GetAxis("Horizontal") < 0){
