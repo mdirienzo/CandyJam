@@ -404,7 +404,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea581cd46b750b24f8bcf680bf9ad0f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numPlayers: 3
+  numPlayers: 4
   playerPrefab: {fileID: 100002, guid: ce0764a516499a346bd4043dfab3c965, type: 2}
   doorPrefab: {fileID: 100000, guid: ad02db44c9a2c425d8bc2758a056a72c, type: 2}
   closedDoorMaterial: {fileID: 2100000, guid: 9b0486b4b5dcd4edb9ea6a3f3bdc96f8, type: 2}
