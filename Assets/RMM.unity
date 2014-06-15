@@ -255,6 +255,8 @@ MonoBehaviour:
   dayMusic: {fileID: 8300000, guid: d11585b8a2a0c42c181d13694f1105f8, type: 3}
   nightMusic: {fileID: 8300000, guid: f8d167ce3701844d1b62c4049a035cd8, type: 3}
   death: {fileID: 8300000, guid: 5452e0c0ab6bd462ca6f72be02a72937, type: 3}
+  thunder: {fileID: 8300000, guid: c8fb06bbc687d4d4ab399f9fa962b10f, type: 3}
+  laugh: {fileID: 8300000, guid: d83de68c63d897449a69a7829ebfb2ad, type: 3}
 --- !u!4 &830867803
 Transform:
   m_ObjectHideFlags: 0

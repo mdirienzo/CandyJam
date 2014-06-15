@@ -177,12 +177,14 @@ public class GameManager : MonoBehaviour {
     }
 
     void flashLightning1() {
+		SoundManager.instance.Thunder ();
         this.setLightning(2.0f);
         this.Invoke("dimLightning", 0.01f);
         this.Invoke("flashLightning2", 1.0f);
     }
 
     void flashLightning2() {
+		//SoundManager.instance.Thunder ();
         this.spawnGhosts();
         this.setLightning(2.0f);
         this.Invoke("dimLightning", 0.1f);
@@ -190,6 +192,8 @@ public class GameManager : MonoBehaviour {
     }
 
     void spawnGhosts() {
+		//har har har
+		//SoundManager.instance.Laugh ();
         LevelManager level = LevelManager.instance;
         for (int i = 0; i < numGhosts + numPlayers * this.ghostsPerPlayer; ++i) {
             Vector3 pos;

@@ -5,6 +5,8 @@ public class SoundManager : MonoBehaviour {
 	public AudioClip dayMusic;
 	public AudioClip nightMusic;
 	public AudioClip death;
+	public AudioClip thunder;
+	public AudioClip laugh;
 
 	public static SoundManager instance;
 	private AudioSource[] audioSource;
@@ -39,10 +41,22 @@ public class SoundManager : MonoBehaviour {
 
 	}
 
+	public void Thunder(){
+
+		audioSource [2].pitch = 1.0f;
+		audioSource [2].PlayOneShot (thunder, 1.0f);
+
+		}
+
+	public void Laugh(){
+		audioSource [2].pitch = 1.0f;
+		audioSource [2].PlayOneShot (laugh, 1.0f);
+		}
+
 	public void Death(){
-
+		audioSource [2].pitch = 1.0f;
 		audioSource [2].PlayOneShot (death, 1.0f);
-
+		this.Invoke ("Laugh", 1.5f);
 	}
 
 	IEnumerator FadeToDark(){
