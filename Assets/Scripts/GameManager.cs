@@ -207,6 +207,7 @@ public class GameManager : MonoBehaviour {
 		}*/
 
 		if (playerRefs.Remove (playerObject)) {
+			SoundManager.instance.Death();
 			Instantiate (explodey,playerObject.transform.position, explodey.transform.rotation);
 			Destroy(playerObject);
 			Debug.Log ("Player Destroyed.");
