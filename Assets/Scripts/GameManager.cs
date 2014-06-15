@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
 public class GameManager : MonoBehaviour {
@@ -14,6 +15,8 @@ public class GameManager : MonoBehaviour {
 	private float startTime;
     private GameObject sun;
     private float sunRotation = 0.0f;
+
+    public float timeUntilDark = 15;
 
 	void Awake() {
 		if (instance == null) {
@@ -48,19 +51,26 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+    void OnGUI() {
+        int secondsLeft = (int)this.timeUntilDark;
+        if (secondsLeft >= 0) {
+            GUI.Label(new Rect(10, 10, 100, 200), ":" + secondsLeft.ToString("D2"));
+        }
+    }
+
 	// Update is called once per frame
 	void Update () {
         float timeElapsed = Time.time - startTime;
-        float leftUntilDark = theDarkTime - timeElapsed;
+        this.timeUntilDark = theDarkTime - timeElapsed;
 
-        if (leftUntilDark < theDarkTime / 2.0f && leftUntilDark > 0.0f) {
-            float r = -110.0f * (1.0f - leftUntilDark / (theDarkTime / 2.0f));
+        if (timeUntilDark < theDarkTime / 2.0f && timeUntilDark > 0.0f) {
+            float r = -110.0f * (1.0f - timeUntilDark / (theDarkTime / 2.0f));
             float dr = r - sunRotation;
             sunRotation = r;
             sun.transform.RotateAround(LevelManager.instance.trueCenterOfMap, Vector3.up, dr);
         }
 
-        if (leftUntilDark < 0.0f && false /* we have not en-dark-ened yet */) {
+        if (timeUntilDark < 0.0f && false /* we have not en-dark-ened yet */) {
 			// Enter darkness mode
 		}
 	}
