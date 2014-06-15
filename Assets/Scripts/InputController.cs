@@ -14,10 +14,10 @@ public class InputController : MonoBehaviour {
 	void Start () {
 		anim = GetComponent<Animator> ();
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
-		
+
 		if (rigidbody.velocity.magnitude == 0) {
 				isMoving = false;
 		} else {
@@ -27,7 +27,7 @@ public class InputController : MonoBehaviour {
 		anim.SetBool ("HorizontalPressed", false);
 
 		//anim.SetFloat ("VerticalSpeed", Mathf.Abs (Input.GetAxis ("Vertical")));
-		
+
 		anim.SetFloat ("VerticalSpeed", Input.GetAxis ("Vertical"));
 
 			//anim.SetFloat ("VerticalSpeed", Input.GetAxis ("Vertical"));
@@ -35,7 +35,7 @@ public class InputController : MonoBehaviour {
 		//if(Mathf.Abs(Input.GetAxis ("Vertical")) < (Mathf.Abs(Input.GetAxis ("Horizontal")))){
 		anim.SetFloat ("HorizontalSpeed", Mathf.Abs(Input.GetAxis ("Horizontal")));
 			//anim.SetFloat ("VerticalSpeed", Input.GetAxis ("Vertical"));
-		//} 	
+		//}
 
 
 		if (isMovable) {
@@ -61,7 +61,7 @@ public class InputController : MonoBehaviour {
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
 				rigidbody.AddForce (Vector3.up * movementSpeed * Input.GetAxis("Vertical"),ForceMode.Force);
 			}
-			
+
 			if(Input.GetAxis("Vertical") < 0){
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
 				rigidbody.AddForce (Vector3.down * movementSpeed * -Input.GetAxis("Vertical"),ForceMode.Force);
@@ -82,10 +82,9 @@ public class InputController : MonoBehaviour {
 			}
 
 			if(rigidbody.velocity.magnitude == 0){
-				Debug.Log ("magnitude 0");
 				anim.StopPlayback();
 			}
-			                                 
+
 		}
 	}
 
