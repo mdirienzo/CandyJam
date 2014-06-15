@@ -107,9 +107,9 @@ public class GameManager : MonoBehaviour {
 
     void flashLightning2() {
         this.spawnGhosts();
-        this.placeDoor();
         this.setLightning(2.0f);
         this.Invoke("dimLightning", 0.1f);
+        this.Invoke("placeDoor", 1.0f);
     }
 
     void spawnGhosts() {
