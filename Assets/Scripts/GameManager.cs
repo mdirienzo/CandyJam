@@ -80,9 +80,10 @@ public class GameManager : MonoBehaviour {
 				for(int i = 0; i < numPlayers; i++){
 					GameObject player = (GameObject)Instantiate(playerPrefab);
 					playerRefs.Add (player);
-
+					player.GetComponent<InputController>().axisName = "Player" + (i+1) + "_";
 					//playerRefs[i] = Instantiate(playerPrefab) as GameObject;
 					player.transform.position = LevelManager.instance.centerOfMap;
+
 					//playerRefs[i].transform.position+= (Vector3.back);
 				}
 			}
