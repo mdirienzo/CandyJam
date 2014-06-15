@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 // Enumerator which yields all possible tile locations within some bounds, e.g. a cartesian product of all rows and all columns
 public struct AllTileLocationEnumerator : IEnumerator<TileLocation> {
@@ -220,6 +221,10 @@ public struct BoundedTiles {
     public int indexOf(TileLocation l) {
         return l.r * this.bound.c + l.c;
     }
+
+    public TileLocation fromIndex(int index) {
+        return new TileLocation(index / this.bound.c, index % this.bound.c);
+    }
 }
 
 // Structure representing a particular tile location (r, c)
@@ -230,6 +235,14 @@ public struct TileLocation {
 
     public static bool operator !=(TileLocation c1, TileLocation c2) {
         return !(c1 == c2);
+    }
+
+    public static float distance(TileLocation c1, TileLocation c2) {
+        int dc = c2.c - c1.c;
+        int dr = c2.r - c1.r;
+        dc = dc < 0 ? -dc : dc;
+        dr = dr < 0 ? -dr : dr;
+        return Mathf.Sqrt(dc*dc + dr*dr);
     }
 
     public static TileLocation zero = new TileLocation(0, 0);

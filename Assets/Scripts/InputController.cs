@@ -5,6 +5,7 @@ public class InputController : MonoBehaviour {
 
 	public float movementSpeed;
 	private bool isMovable = true;
+	private float maxVelocity = 2;
 
 	private Animator anim;
 	private bool isMoving = false;
@@ -59,6 +60,10 @@ public class InputController : MonoBehaviour {
 			}
 			if(Input.GetAxis("Vertical") < 0){
 				//transform.Translate (Vector3.down * movementSpeed * -Input.GetAxis("Vertical"));
+			}
+
+			if(rigidbody.velocity.magnitude > maxVelocity){
+				rigidbody.velocity = rigidbody.velocity.normalized * maxVelocity;
 			}
 			                                 
 		}
