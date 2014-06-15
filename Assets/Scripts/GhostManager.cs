@@ -21,10 +21,17 @@ public class GhostManager : MonoBehaviour {
 		}
 
         if (currentTarget != null) {
-            Debug.Log("currentTarget = " + currentTarget + ", position = " + this.gameObject.transform.position + ", highestThreat = " + highestThreat);
     		this.gameObject.transform.position = Vector3.MoveTowards(this.gameObject.transform.position, currentTarget.transform.position, (highestThreat * 0.01f) + 0.001f);
-    //		Vector3 direction = (currentTarget.transform.position - this.gameObject.transform.position).Normalize + ((distance * .10) + 10);
-    //		this.gameObject. += direction;
         }
 	}
+
+    void OnTriggerEnter(Collider obj) {
+        if (obj.gameObject.tag == "Player") {
+            this.eatPlayer(obj.gameObject);
+        }
+    }
+
+    void eatPlayer(GameObject player) {
+        GameManager.instance.KillPlayer(player);
+    }
 }

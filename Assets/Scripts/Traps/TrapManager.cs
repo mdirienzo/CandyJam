@@ -5,12 +5,12 @@ public class TrapManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
+
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
-	
+
 	}
 
 	/*
@@ -25,13 +25,10 @@ public class TrapManager : MonoBehaviour {
 
 	}*/
 
-	public void OnTriggerEnter(Collider otherObject){
-		if (otherObject.tag == "Player") {
 
-			//otherObject.GetComponent<PlayerManager>().killPlayer();
-			GameManager.instance.KillPlayer(otherObject.gameObject);
-			//Debug.Log ("other object tag is: " + otherObject.tag);
+    void OnTriggerEnter(Collider obj) {
+        if (obj.gameObject.tag == "Player") {
+			GameManager.instance.KillPlayer(obj.gameObject);
 		}
-
 	}
 }

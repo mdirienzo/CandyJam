@@ -13,7 +13,7 @@ public class InputController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		axisName = "Player1_";
+//		axisName = "Player2_";
 		anim = GetComponent<Animator> ();
 	}
 
