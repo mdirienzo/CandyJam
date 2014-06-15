@@ -531,7 +531,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1693bf4ca1fb3d1468f061a78f608d83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isAlive: 0
+  hasLantern: 0
 --- !u!4 &1583895937
 Transform:
   m_ObjectHideFlags: 0

@@ -25,8 +25,11 @@ public class GameManager : MonoBehaviour {
     private GameObject sun;
     private GameObject lightning;
     private GameObject keyPrefab;
+    private GameObject torchPrefab;
     private float sunRotation = 0.0f;
     private int keysObtained = 0;
+    private float normalIntensity = 0.3f;
+    private float torchIntensity = 0.75f;
 
     public bool isDark = false;
     public bool isDoorOpen = false;
@@ -75,6 +78,11 @@ public class GameManager : MonoBehaviour {
             Debug.LogError("No key!");
         }
 
+        this.torchPrefab = (GameObject)Resources.Load("Torch", typeof(GameObject));
+        if (this.keyPrefab == null) {
+            Debug.LogError("No key!");
+        }
+
 		startTime = Time.time;
 		if (playerPrefab == null) {
 			Debug.LogError ("Player prefab not set!");
@@ -98,6 +106,13 @@ public class GameManager : MonoBehaviour {
 				}
 			}
 		}
+
+        LevelManager level = LevelManager.instance;
+        TileLocation torchLoc;
+        do { torchLoc = level.tiles.random(); }
+        while (level.isTrapped(torchLoc));
+        Vector3 torchPos = level.centerOfTile(torchLoc);
+        Instantiate(this.torchPrefab, torchPos, Quaternion.identity);
 	}
 
     void OnGUI() {
@@ -134,8 +149,11 @@ public class GameManager : MonoBehaviour {
             sunRotation = r;
             sun.transform.RotateAround(LevelManager.instance.trueCenterOfMap, Vector3.up, dr);
 
-            float playerLightIntensity = 0.3f * (1.0f - this.timeUntilDark / (theDarkTime / 2.0f));
-            foreach (GameObject light in GameObject.FindGameObjectsWithTag("PlayerLight")) {
+            foreach (GameObject player in this.playerRefs) {
+                PlayerManager manager = player.GetComponent<PlayerManager>();
+                Light light = player.GetComponentInChildren<Light>();
+                float maxIntensity = manager.hasLantern ? torchIntensity : normalIntensity;
+                float playerLightIntensity = maxIntensity * (1.0f - this.timeUntilDark / (theDarkTime / 2.0f));
                 light.GetComponent<Light>().intensity = playerLightIntensity;
             }
         }
@@ -228,13 +246,24 @@ public class GameManager : MonoBehaviour {
         GameObject.FindWithTag("Door").GetComponent<MeshRenderer>().material = this.closedDoorMaterial;
     }
 
-	public void keyPickedUp(GameObject keyObj) {
+	public void keyPickedUp(GameObject player, GameObject key) {
         this.keysObtained += 1;
         if (this.keysObtained >= this.keysRequired) {
             this.openDoor();
         }
-        Destroy(keyObj);
+        Destroy(key);
 	}
+
+    public void torchPickedUp(GameObject player, GameObject torch) {
+        Destroy(torch);
+        player.GetComponent<PlayerManager>().hasLantern = true;
+        Light light = player.GetComponentInChildren<Light>();
+        light.spotAngle = 90;
+        if (this.isDark) {
+            // the update loop is no longer touching the light intensity, so touch directly
+            light.intensity = torchIntensity;
+        }
+    }
 
     public void doorTouched(GameObject player) {
         if (this.isDoorOpen) {
