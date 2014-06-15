@@ -45,13 +45,15 @@ public class LevelManager : MonoBehaviour {
 	void Update() { }
 
     public TileLocation spawnPoint {
-        get {
-            return new TileLocation(this.tiles.bound.r / 2, this.tiles.bound.c / 2);
-        }
+        get { return new TileLocation(this.tiles.bound.r / 2, this.tiles.bound.c / 2); }
     }
 
-    public Vector3 centerOfMap() {
-        return this.centerOfTile(this.spawnPoint);
+    public Vector3 centerOfMap {
+        get { return this.centerOfTile(this.spawnPoint); }
+    }
+
+    public Vector3 trueCenterOfMap {
+        get { return this.extentsOfMap / 2.0f; }
     }
 
     public Vector3 centerOfTile(TileLocation loc) {
@@ -68,8 +70,8 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
-    public Vector3 extentsOfMap() {
-        return this.centerOfTile(this.tiles.extent) + new Vector3(0.5f, 0.5f, 0.0f);
+    public Vector3 extentsOfMap {
+        get { return this.centerOfTile(this.tiles.extent) + new Vector3(0.5f, 0.5f, 0.0f); }
     }
 
     private void buildMap() {
@@ -148,10 +150,10 @@ public class LevelManager : MonoBehaviour {
     }
 
     private void positionBorder() {
-        Vector3 position = this.extentsOfMap() / 2.0f;
+        Vector3 position = this.extentsOfMap / 2.0f;
         position.z = 5.0f;
         GameObject borderObj = (GameObject)Instantiate(this.borderPrefab, Vector3.zero, Quaternion.identity);
-        borderObj.transform.localScale = this.extentsOfMap() + new Vector3(1.1f, 1.1f, 0.0f);
+        borderObj.transform.localScale = this.extentsOfMap + new Vector3(1.1f, 1.1f, 0.0f);
         borderObj.transform.position = position;
     }
 
