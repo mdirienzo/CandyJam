@@ -258,7 +258,7 @@ public class WallBuilder {
     private bool[] flood;
     private System.Random rng;
     private List<TileLocation> randomLocations;
-
+    private IEnumerator<TileLocation> randomLocationEnumerator;
 
     public WallBuilder(int extraWalks, bool[] impassable, BoundedTiles tiles, TileLocation spawnPoint, System.Random rng) {
         this.extraWalks = extraWalks;
@@ -269,6 +269,7 @@ public class WallBuilder {
         this.reachable = new bool[this.tiles.count];
         this.flood = new bool[this.tiles.count];
         this.randomLocations = this.tiles.shuffleAll();
+        this.randomLocationEnumerator = this.randomLocations.GetEnumerator();
 
         foreach (TileLocation l in tiles.all) {
             TileWall w = new TileWall();
@@ -276,6 +277,16 @@ public class WallBuilder {
             w.north = true;
             w.east  = true;
         }
+    }
+
+    private TileLocation nextRandomLocation() {
+        if (!this.randomLocationEnumerator.MoveNext()) {
+            this.randomLocations = this.tiles.shuffleAll();
+            this.randomLocationEnumerator = this.randomLocations.GetEnumerator();
+            this.randomLocationEnumerator.MoveNext();
+        }
+
+        return this.randomLocationEnumerator.Current;
     }
 
     private void debugWalls() {
@@ -326,8 +337,8 @@ public class WallBuilder {
             TileLocation b;
             float dist;
             do {
-                a = this.randomLocations[RNG.random.Next(this.randomLocations.Count)];
-                b = this.randomLocations[RNG.random.Next(this.randomLocations.Count)];
+                a = this.nextRandomLocation();
+                b = this.nextRandomLocation();
                 dist = TileLocation.distance(a, b);
             } while (dist <= 1.0f || dist > this.tiles.bound.c/3*2);
 
@@ -344,10 +355,9 @@ public class WallBuilder {
     private TileLocation findIsolatedLocation() {
         TileLocation bestLoc = TileLocation.notFound;
         int bestReach = this.tiles.count;
-        IEnumerator<TileLocation> locs = this.randomLocations.GetEnumerator();
-
-        while (bestReach > 1 && locs.MoveNext()) {
-            TileLocation loc = locs.Current;
+        int count = 0;
+        while (bestReach > 1 && count++ < this.tiles.count) {
+            TileLocation loc = this.nextRandomLocation();
             int locIndex = this.tiles.indexOf(loc);
             if (this.impassable[locIndex] || this.reachable[locIndex]) {
                 continue;
