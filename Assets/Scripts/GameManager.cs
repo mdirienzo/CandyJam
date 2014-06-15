@@ -255,6 +255,7 @@ public class GameManager : MonoBehaviour {
 		if (playerRefs.Remove (playerObject)) {
 			if ( wasKilled){
 				Instantiate (explodey,playerObject.transform.position, explodey.transform.rotation);
+				SoundManager.instance.Death();
 			}
 			Destroy(playerObject);
 			Debug.Log ("Player Destroyed.");

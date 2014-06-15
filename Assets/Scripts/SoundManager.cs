@@ -4,13 +4,15 @@ using System.Collections;
 public class SoundManager : MonoBehaviour {
 	public AudioClip dayMusic;
 	public AudioClip nightMusic;
+	public AudioClip death;
 
+	public static SoundManager instance;
 	private AudioSource[] audioSource;
 	private bool fadingToDark = false;
 
 	// Use this for initialization
 	void Start () {
-
+		instance = this;
 		audioSource = GetComponents<AudioSource> ();
 		//Start the day music at start of game
 		audioSource[0].clip = dayMusic;
@@ -34,6 +36,12 @@ public class SoundManager : MonoBehaviour {
 		fadingToDark = true;
 		StartCoroutine(FadeToDark ());
 
+
+	}
+
+	public void Death(){
+
+		audioSource [2].PlayOneShot (death, 1.0f);
 
 	}
 
