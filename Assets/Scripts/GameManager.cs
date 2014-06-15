@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 	public int numPlayers;
+    public int keysRequired = 1;
 	public GameObject playerPrefab;
     public GameObject doorPrefab;
 	public GameObject explodey;
@@ -21,16 +22,17 @@ public class GameManager : MonoBehaviour {
     private GameObject ghostPrefab;
     private GameObject sun;
     private GameObject lightning;
+    private GameObject keyPrefab;
     private float sunRotation = 0.0f;
+    private int keysObtained = 0;
 
     public bool isDark = false;
     public bool isDoorOpen = false;
     public float timeUntilDark = 20;
+    public bool winCondition = false;
 
 	void Awake() {
-
-
-		List<GameObject> playerRefs = new List<GameObject> ();
+		this.playerRefs = new List<GameObject> ();
 
         if (instance == null) {
             instance = this;
@@ -66,6 +68,11 @@ public class GameManager : MonoBehaviour {
             Debug.LogError("No ghost!");
         }
 
+        this.keyPrefab = (GameObject)Resources.Load("Key", typeof(GameObject));
+        if (this.keyPrefab == null) {
+            Debug.LogError("No key!");
+        }
+
 		startTime = Time.time;
 		if (playerPrefab == null) {
 			Debug.LogError ("Player prefab not set!");
@@ -95,6 +102,22 @@ public class GameManager : MonoBehaviour {
         int secondsLeft = (int)this.timeUntilDark;
         if (secondsLeft >= 0) {
             GUI.Label(new Rect(10, 10, 100, 200), ":" + secondsLeft.ToString("D2"));
+        }
+
+
+        if (this.playerRefs.Count == 0) {
+            GUIStyle style = new GUIStyle();
+            style.fontSize = 36;
+            string text = "";
+            if (this.winCondition) {
+                style.normal.textColor = Color.green;
+                text = "You win!";
+            } else {
+                style.normal.textColor = Color.red;
+                text = "YOU LOSE!";
+            }
+
+            GUI.Label(new Rect(Screen.width / 2 - 50, Screen.height / 2 - 25, 100, 50), text, style);
         }
     }
 
@@ -139,7 +162,7 @@ public class GameManager : MonoBehaviour {
         this.spawnGhosts();
         this.setLightning(2.0f);
         this.Invoke("dimLightning", 0.1f);
-        this.Invoke("placeDoor", 1.0f);
+        this.Invoke("placeDoorAndKeys", 1.0f);
     }
 
     void spawnGhosts() {
@@ -165,22 +188,32 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    void placeDoor() {
+    void placeDoorAndKeys() {
         LevelManager level = LevelManager.instance;
         CardinalDir side = (CardinalDir)RNG.random.Next(4);
         TileLocation loc;
         Quaternion rot = Quaternion.identity;
         Vector3 scale = Vector3.one;
-        switch (side) {
-            case CardinalDir.NORTH: loc = new TileLocation(level.tiles.bound.r-1, RNG.random.Next(level.tiles.bound.c)); rot.eulerAngles = new Vector3(0.0f, 0.0f, 90.0f); scale.y = -1.0f; break;
-            case CardinalDir.EAST:  loc = new TileLocation(RNG.random.Next(level.tiles.bound.r), level.tiles.bound.c-1); scale.x = -1.0f; break;
-            case CardinalDir.SOUTH: loc = new TileLocation(level.tiles.bound.r-1, RNG.random.Next(level.tiles.bound.c)); rot.eulerAngles = new Vector3(0.0f, 0.0f, 90.0f); break;
-            default:                loc = new TileLocation(RNG.random.Next(level.tiles.bound.r), level.tiles.bound.c-1); break;
-        }
+        do {
+            switch (side) {
+                case CardinalDir.NORTH: loc = new TileLocation(level.tiles.bound.r-1, RNG.random.Next(level.tiles.bound.c)); rot.eulerAngles = new Vector3(0.0f, 0.0f, 90.0f); scale.y = -1.0f; break;
+                case CardinalDir.EAST:  loc = new TileLocation(RNG.random.Next(level.tiles.bound.r), level.tiles.bound.c-1); scale.x = -1.0f; break;
+                case CardinalDir.SOUTH: loc = new TileLocation(level.tiles.bound.r-1, RNG.random.Next(level.tiles.bound.c)); rot.eulerAngles = new Vector3(0.0f, 0.0f, 90.0f); break;
+                default:                loc = new TileLocation(RNG.random.Next(level.tiles.bound.r), level.tiles.bound.c-1); break;
+            }
+        } while (level.isTrapped(loc));
 
         Instantiate(this.doorPrefab, level.centerOfTile(loc), rot);
         this.closeDoor();
-        this.Invoke("closeDoor", 10.0f);
+
+        for (int i = 0; i < keysRequired; ++i) {
+            do {
+                loc = level.tiles.random();
+            } while (level.isTrapped(loc));
+            Vector3 pos = level.centerOfTile(loc);
+            GameObject key = (GameObject)Instantiate(this.keyPrefab, pos, Quaternion.identity);
+            key.name = "Key " + i;
+        }
     }
 
     void openDoor() {
@@ -193,9 +226,20 @@ public class GameManager : MonoBehaviour {
         GameObject.FindWithTag("Door").GetComponent<MeshRenderer>().material = this.closedDoorMaterial;
     }
 
-	void PlayerPicksUpKeyItem () {
-
+	public void keyPickedUp(GameObject keyObj) {
+        this.keysObtained += 1;
+        if (this.keysObtained >= this.keysRequired) {
+            this.openDoor();
+        }
+        Destroy(keyObj);
 	}
+
+    public void doorTouched(GameObject player) {
+        if (this.isDoorOpen) {
+            this.winCondition = true;
+            this.KillPlayer(player);
+        }
+    }
 
 	public void KillPlayer(GameObject playerObject){
 
@@ -210,7 +254,6 @@ public class GameManager : MonoBehaviour {
 			Instantiate (explodey,playerObject.transform.position, explodey.transform.rotation);
 			Destroy(playerObject);
 			Debug.Log ("Player Destroyed.");
-		};
-
+		}
 	}
 }

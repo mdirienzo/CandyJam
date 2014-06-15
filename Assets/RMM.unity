@@ -3,7 +3,7 @@
 --- !u!29 &1
 SceneSettings:
   m_ObjectHideFlags: 0
-  m_PVSData: 
+  m_PVSData:
   m_PVSObjectsArray: []
   m_PVSPortalsArray: []
   m_OcclusionBakeSettings:
@@ -249,8 +249,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2971a21f0ece8b840a3e60f8ccd10ad3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   dayMusic: {fileID: 8300000, guid: d11585b8a2a0c42c181d13694f1105f8, type: 3}
   nightMusic: {fileID: 8300000, guid: f8d167ce3701844d1b62c4049a035cd8, type: 3}
 --- !u!4 &830867803
@@ -469,8 +469,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1693bf4ca1fb3d1468f061a78f608d83, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   isAlive: 0
 --- !u!4 &1583895937
 Transform:
@@ -509,8 +509,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44ccc8464d464e5498e6dcdbf5562ae6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   borderPrefab: {fileID: 100000, guid: 0f1828aa50cd34bddb91839190471e15, type: 2}
   floorPrefabs:
   - {fileID: 100000, guid: 081bf4c7429a84a7db4835ac6ba93515, type: 2}
@@ -562,9 +562,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea581cd46b750b24f8bcf680bf9ad0f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   numPlayers: 2
+  keysRequired: 1
   playerPrefab: {fileID: 100002, guid: ce0764a516499a346bd4043dfab3c965, type: 2}
   doorPrefab: {fileID: 100000, guid: ad02db44c9a2c425d8bc2758a056a72c, type: 2}
   explodey: {fileID: 100004, guid: acb381b49b4c930408b9c5c77c54f600, type: 2}
@@ -574,6 +575,7 @@ MonoBehaviour:
   isDark: 0
   isDoorOpen: 0
   timeUntilDark: 20
+  winCondition: 0
 --- !u!4 &2039978338
 Transform:
   m_ObjectHideFlags: 0
