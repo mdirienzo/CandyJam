@@ -40,7 +40,7 @@ public class InputController : MonoBehaviour {
 			//anim.SetFloat ("VerticalSpeed", Input.GetAxis ("Vertical"));
 		//}
 
-		Debug.Log (Input.GetAxis(axisName + "Horizontal"));
+		//Debug.Log (Input.GetAxis(axisName + "Horizontal"));
 		if (isMovable) {
 			if(Input.GetAxis(axisName + "Horizontal") > 0){
 				//transform.Translate (Vector3.right * movementSpeed * Input.GetAxis("Horizontal"));
