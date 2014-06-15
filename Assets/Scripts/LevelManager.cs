@@ -93,7 +93,7 @@ public class LevelManager : MonoBehaviour {
 
         // create the traps
         this.trappedTiles = new bool[this.tiles.count];
-        for (int i = 0; i < (this.tiles.bound.r * this.tiles.bound.c) * 0.1f; ++i) {
+        for (int i = 0; i < (this.tiles.bound.r * this.tiles.bound.c) * 0.05f; ++i) {
             TileLocation l;
             do { l = this.tiles.random(); } while (l == this.spawnPoint);
 

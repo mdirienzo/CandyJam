@@ -6,6 +6,8 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour {
 	public int numPlayers;
     public int keysRequired = 1;
+    public int numGhosts = 1;
+    public int ghostsPerPlayer = 1;
 	public GameObject playerPrefab;
     public GameObject doorPrefab;
 	public GameObject explodey;
@@ -167,7 +169,7 @@ public class GameManager : MonoBehaviour {
 
     void spawnGhosts() {
         LevelManager level = LevelManager.instance;
-        for (int i = 0; i < numPlayers * 2; ++i) {
+        for (int i = 0; i < numGhosts + numPlayers * this.ghostsPerPlayer; ++i) {
             Vector3 pos;
             float nearestDistance;
             do {
