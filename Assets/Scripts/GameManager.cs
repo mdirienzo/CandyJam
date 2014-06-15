@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour {
 	public List<GameObject> playerRefs;
 
 	// Game Control Variables
-	private float theDarkTime = 20;
+	private float theDarkTime = 15;
 	private float startTime;
     private GameObject ghostPrefab;
     private GameObject sun;
@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour {
 
     public bool isDark = false;
     public bool isDoorOpen = false;
-    public float timeUntilDark = 20;
+    public float timeUntilDark = 15;
     public bool winCondition = false;
 
 	void Awake() {
