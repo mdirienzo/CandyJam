@@ -32,8 +32,6 @@ public class GhostManager : MonoBehaviour {
     }
 
     void eatPlayer(GameObject player) {
-        Debug.Log("Yum! " + player);
-        // would like to actually eat
-       // GameManager.instance.KillPlayer(player);
+        GameManager.instance.KillPlayer(player);
     }
 }
