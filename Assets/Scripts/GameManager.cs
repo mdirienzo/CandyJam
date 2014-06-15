@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 
 
-		if (playerPrefab == null) 
+		if (playerPrefab == null)
 		{
 			Debug.LogError ("Player prefab not set!");
 		} else {
@@ -33,12 +33,12 @@ public class GameManager : MonoBehaviour {
 			}else{
 				Debug.Log ("Spawning " + numPlayers + " players!");
 				//spawn players based on size of map
-				
+
 				playerRefs = new GameObject[numPlayers];
-				
+
 				for(int i = 0; i < numPlayers; i++){
 					playerRefs[i] = Instantiate(playerPrefab) as GameObject;
-					playerRefs[i].transform.position = LevelManager.instance.CenterOfMap();
+					playerRefs[i].transform.position = LevelManager.instance.centerOfMap();
 					//playerRefs[i].transform.position+= (Vector3.back);
 				}
 			}
