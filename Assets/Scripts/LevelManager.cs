@@ -18,6 +18,7 @@ public class LevelManager : MonoBehaviour {
     public int rows;
 
     public BoundedTiles tiles;
+    private bool[] trappedTiles;
     private GameObject xClipWallPrefab = null;
     private GameObject yClipWallPrefab = null;
 
@@ -74,6 +75,10 @@ public class LevelManager : MonoBehaviour {
         get { return this.centerOfTile(this.tiles.extent) + new Vector3(0.5f, 0.5f, 0.0f); }
     }
 
+    public bool isTrapped(TileLocation l) {
+        return this.trappedTiles[this.tiles.indexOf(l)];
+    }
+
     private void buildMap() {
         System.Random rng = new System.Random();
 
@@ -87,12 +92,12 @@ public class LevelManager : MonoBehaviour {
         }
 
         // create the traps
-        bool[] trappedTiles = new bool[this.tiles.count];
-        for (int i = 0; i < (this.tiles.bound.r * this.tiles.bound.c) * 0.1f; ++i) {
+        this.trappedTiles = new bool[this.tiles.count];
+        for (int i = 0; i < (this.tiles.bound.r * this.tiles.bound.c) * 0.05f; ++i) {
             TileLocation l;
             do { l = this.tiles.random(); } while (l == this.spawnPoint);
 
-            trappedTiles[this.tiles.indexOf(l)] = true;
+            this.trappedTiles[this.tiles.indexOf(l)] = true;
 
             GameObject trapPrefab = this.trapPrefabs[RNG.random.Next(trapPrefabs.Length)];
             Instantiate(trapPrefab, this.centerOfTile(l), Quaternion.identity);
@@ -100,7 +105,7 @@ public class LevelManager : MonoBehaviour {
 
         TileWall[] walls = new WallBuilder (
             extraWalks: 0,
-            impassable: trappedTiles,
+            impassable: this.trappedTiles,
             tiles:      this.tiles,
             spawnPoint: this.spawnPoint,
             rng:        rng

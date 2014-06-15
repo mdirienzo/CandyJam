@@ -625,6 +625,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numPlayers: 1
+  keysRequired: 1
+  numGhosts: 1
+  ghostsPerPlayer: 1
   playerPrefab: {fileID: 100002, guid: ce0764a516499a346bd4043dfab3c965, type: 2}
   doorPrefab: {fileID: 100000, guid: ad02db44c9a2c425d8bc2758a056a72c, type: 2}
   explodey: {fileID: 100004, guid: acb381b49b4c930408b9c5c77c54f600, type: 2}
@@ -634,6 +637,7 @@ MonoBehaviour:
   isDark: 0
   isDoorOpen: 0
   timeUntilDark: 20
+  winCondition: 0
 --- !u!4 &2039978338
 Transform:
   m_ObjectHideFlags: 0

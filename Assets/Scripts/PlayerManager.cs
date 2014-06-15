@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class PlayerManager : MonoBehaviour {
-	
+
 	private ItemAction currentItemAction = null;
 	private float lightRadius;
 	public bool isAlive;
@@ -11,7 +11,7 @@ public class PlayerManager : MonoBehaviour {
 	void Start () {
 		lightRadius = 50;
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		if (currentItemAction is LampAction) {
@@ -32,16 +32,11 @@ public class PlayerManager : MonoBehaviour {
 	}
 
 	public void OnCollisionEnter(Collision collision) {
-		Debug.Log ("COLLISION");
-
-
-		ItemManager[] itemsCollected = collision.gameObject.GetComponents <ItemManager> ();
-
-		if (itemsCollected.Length > 0) {
-			this.currentItemAction = itemsCollected [0].Action ();
-			Destroy (collision.gameObject);
-			}
-
+        if (collision.gameObject.tag == "Key") {
+            GameManager.instance.keyPickedUp(collision.gameObject);
+        } else if (collision.gameObject.tag == "Door") {
+            GameManager.instance.doorTouched(this.gameObject);
+        }
 	}
 
 
