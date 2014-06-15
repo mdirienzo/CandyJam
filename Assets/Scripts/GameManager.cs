@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 	public int numPlayers;
-    public int keysRequired = 1;
+    private int keysRequired = 1;
     public int numGhosts = 1;
     public int ghostsPerPlayer = 1;
 	public GameObject playerPrefab;
@@ -109,11 +109,14 @@ public class GameManager : MonoBehaviour {
 
 		keysRequired = numPlayers;
         LevelManager level = LevelManager.instance;
-        TileLocation torchLoc;
-        do { torchLoc = level.tiles.random(); }
-        while (level.isTrapped(torchLoc));
-        Vector3 torchPos = level.centerOfTile(torchLoc);
-        Instantiate(this.torchPrefab, torchPos, Quaternion.identity);
+		if (numPlayers > 1) {
+						TileLocation torchLoc;
+						do {
+								torchLoc = level.tiles.random ();
+						} while (level.isTrapped(torchLoc));
+						Vector3 torchPos = level.centerOfTile (torchLoc);
+						Instantiate (this.torchPrefab, torchPos, Quaternion.identity);
+				}
 	}
 
     void OnGUI() {
