@@ -266,7 +266,7 @@ public class GameManager : MonoBehaviour {
         Destroy(torch);
         player.GetComponent<PlayerManager>().hasLantern = true;
         Light light = player.GetComponentInChildren<Light>();
-        light.spotAngle = 90;
+        light.spotAngle = 120;
         if (this.isDark) {
             // the update loop is no longer touching the light intensity, so touch directly
             light.intensity = torchIntensity;

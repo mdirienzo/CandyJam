@@ -103,7 +103,7 @@ Light:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 0
   m_Range: 10
-  m_SpotAngle: 45
+  m_SpotAngle: 60
   m_CookieSize: 10
   m_Shadows:
     m_Type: 0
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1693bf4ca1fb3d1468f061a78f608d83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isAlive: 1
+  hasLantern: 0
 --- !u!135 &13500000
 SphereCollider:
   m_ObjectHideFlags: 1
