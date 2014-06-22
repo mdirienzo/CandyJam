@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviour {
 	public GameObject explodey;
     public Material closedDoorMaterial;
     public Material openDoorMaterial;
+    public int initNumPlayers = 1;
+    public int initColumns = 19;
+    public int initRows = 14;
 
 	public static GameManager instance;
 
@@ -18,21 +21,39 @@ public class GameManager : MonoBehaviour {
 
 	// Game Control Variables
 	private float theDarkTime = 15;
-	private float startTime;
+    private float normalIntensity = 0.3f;
+    private float torchIntensity = 0.75f;
+
     private GameObject ghostPrefab;
     private GameObject sun;
     private GameObject lightning;
     private GameObject keyPrefab;
     private GameObject torchPrefab;
+
+    private bool paused;
+    private float startTime;
     private float sunRotation = 0.0f;
     private int keysObtained = 0;
-    private float normalIntensity = 0.3f;
-    private float torchIntensity = 0.75f;
+    private bool _isDark = false;
+    private bool _isDoorOpen = false;
+    private float _timeUntilDark = 15;
+    private bool _winCondition = false;
+    public bool isDark { get { return _isDark; } }
+    public bool isDoorOpen { get { return _isDoorOpen; } }
+    public float timeUntilDark { get { return _timeUntilDark; } }
+    public bool winCondition { get { return _winCondition; } }
 
-    public bool isDark = false;
-    public bool isDoorOpen = false;
-    public float timeUntilDark = 15;
-    public bool winCondition = false;
+    private int nextNumPlayers;
+    private int nextRows;
+    private int nextColumns;
+
+    private string[] managedTags = new string[] {
+        "Ghost",
+        "Door",
+        "Key",
+        "Player",
+        "Torch"
+    };
 
     public int numPlayers {
         get { return LevelManager.instance.numPlayers; }
@@ -42,8 +63,12 @@ public class GameManager : MonoBehaviour {
         get { return LevelManager.instance.numPlayers; }
     }
 
-	void Awake() {
-		this.playerRefs = new List<GameObject> ();
+	public void Awake() {
+		this.playerRefs = new List<GameObject>();
+
+        this.nextNumPlayers = this.initNumPlayers;
+        this.nextRows = this.initRows;
+        this.nextColumns = this.initColumns;
 
         if (instance == null) {
             instance = this;
@@ -60,18 +85,14 @@ public class GameManager : MonoBehaviour {
         if (this.openDoorMaterial == null) {
             Debug.LogError("no open door material!");
         }
-
 	}
 
-
-	void Start() {
-        LevelManager level = LevelManager.instance;
-        int numPlayers = level.numPlayers;
-
+	public void Start() {
         this.sun = GameObject.FindWithTag("Sun");
         if (this.sun == null) {
             Debug.LogError("No sun!");
         }
+
         this.lightning = GameObject.FindWithTag("Lightning");
         if (this.lightning == null) {
             Debug.LogError("No lightning!");
@@ -92,42 +113,77 @@ public class GameManager : MonoBehaviour {
             Debug.LogError("No key!");
         }
 
-		startTime = Time.time;
-		if (playerPrefab == null) {
+		if (this.playerPrefab == null) {
 			Debug.LogError ("Player prefab not set!");
-		} else {
-			Debug.Log ("Spawning " + numPlayers + " players!");
-			//spawn players based on size of map
-
-			//playerRefs = new GameObject[numPlayers];
-
-			for (int i = 0; i < numPlayers; ++i) {
-				GameObject player = (GameObject)Instantiate(playerPrefab);
-				playerRefs.Add(player);
-				player.GetComponent<InputController>().axisName = "Player" + (i+1) + "_";
-				player.transform.position = level.spawnPointForPlayer(i);
-			}
 		}
 
-		if (numPlayers > 1) {
-    		TileLocation torchLoc;
-    		do {
-				torchLoc = level.tiles.random ();
-    		} while (level.isBadPlaceForThings(torchLoc));
-    		Vector3 torchPos = level.centerOfTile (torchLoc);
-    		Instantiate (this.torchPrefab, torchPos, Quaternion.identity);
-    	}
-	}
+        this.beginRound(this.initNumPlayers, this.initRows, this.initColumns);
+    }
 
-    void OnGUI() {
+    public void OnGUI() {
         int secondsLeft = (int)this.timeUntilDark;
         if (secondsLeft >= 0) {
             GUI.Label(new Rect(10, 10, 100, 200), ":" + secondsLeft.ToString("D2"));
         }
 
+        if (this.paused) {
+            GUIStyle countStyle = new GUIStyle();
+            countStyle.alignment = TextAnchor.MiddleCenter;
+            countStyle.fontSize = 20;
+
+            GUI.BeginGroup(new Rect(Screen.width / 2 - 100, Screen.height / 2 - 120, 200, 240));
+            if (GUI.Button(new Rect(0, 0, 200, 40), "Unpause")) {
+                this.unpause();
+            }
+
+            if (GUI.Button(new Rect(0, 40, 50, 40), "1P")) {
+                this.nextNumPlayers = 1;
+            }
+            if (GUI.Button(new Rect(50, 40, 50, 40), "2P")) {
+                this.nextNumPlayers = 2;
+            }
+            if (GUI.Button(new Rect(100, 40, 50, 40), "3P")) {
+                this.nextNumPlayers = 3;
+            }
+            if (GUI.Button(new Rect(150, 40, 50, 40), "4P")) {
+                this.nextNumPlayers = 4;
+            }
+
+            if (GUI.Button(new Rect(0, 80, 40, 40), "-") && this.nextColumns > 10) {
+                --this.nextColumns;
+            }
+            GUI.Label(new Rect(40, 80, 120, 40), this.nextColumns + " Columns", countStyle);
+            if (GUI.Button(new Rect(160, 80, 40, 40), "+") && this.nextColumns < 100) {
+                ++this.nextColumns;
+            }
+
+            if (GUI.Button(new Rect(0, 120, 40, 40), "-") && this.nextRows > 10) {
+                --this.nextRows;
+            }
+            GUI.Label(new Rect(40, 120, 120, 40), this.nextRows + " Rows", countStyle);
+            if (GUI.Button(new Rect(160, 120, 40, 40), "+") && this.nextRows < 100) {
+                ++this.nextRows;
+            }
+
+            if (GUI.Button(new Rect(0, 160, 200, 40), "Apply / Restart")) {
+                this.unpause();
+                newRound();
+            }
+
+            if (GUI.Button(new Rect(0, 200, 200, 40), "Quit")) {
+                Application.Quit();
+            }
+
+            GUI.EndGroup();
+        } else {
+            if (GUI.Button(new Rect(10, 30, 100, 20), "Pause")) {
+                this.pause();
+            }
+        }
 
         if (this.playerRefs.Count == 0) {
             GUIStyle style = new GUIStyle();
+            style.alignment = TextAnchor.MiddleCenter;
             style.fontSize = 36;
             string text = "";
             if (this.winCondition) {
@@ -142,10 +198,10 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    public void Update() {
         float timeElapsed = Time.time - startTime;
-        this.timeUntilDark = theDarkTime - timeElapsed;
+        this._timeUntilDark = theDarkTime - timeElapsed;
 
         if (this.timeUntilDark < theDarkTime / 2.0f && this.timeUntilDark > 0.0f) {
             float r = -110.0f * (1.0f - this.timeUntilDark / (theDarkTime / 2.0f));
@@ -163,10 +219,86 @@ public class GameManager : MonoBehaviour {
         }
 
         if (this.timeUntilDark < 0.0f && !this.isDark) {
-            this.isDark = true;
+            this._isDark = true;
             this.Invoke("flashLightning1", 0.5f);
-		}
-	}
+        }
+    }
+
+    public void newRound() {
+        this.beginRound(this.nextNumPlayers, this.nextRows, this.nextColumns);
+    }
+
+    public void beginRound(int numPlayers, int rows, int columns) {
+        this.endRound();
+
+        LevelManager level = LevelManager.instance;
+        level.beginRound(numPlayers, rows, columns);
+        this.spawnPlayers();
+        this.spawnTorch();
+        this.startTime = Time.time;
+        SoundManager.instance.beginRound();
+    }
+
+    public void endRound() {
+        this.CancelInvoke();
+
+        SoundManager.instance.endRound();
+
+        this._isDark = false;
+        this._isDoorOpen = false;
+        this._timeUntilDark = this.theDarkTime;
+        this._winCondition = false;
+        this.keysObtained = 0;
+
+        sun.transform.RotateAround(LevelManager.instance.trueCenterOfMap, Vector3.up, -sunRotation);
+        sunRotation = 0.0f;
+
+        this.playerRefs.Clear();
+
+        foreach (string tag in this.managedTags) {
+            foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag)) {
+                Destroy(obj);
+            }
+        }
+
+        LevelManager.instance.endRound();
+    }
+
+    public void pause() {
+        this.paused = true;
+        Time.timeScale = 0.0f;
+        SoundManager.instance.pause();
+    }
+
+    public void unpause() {
+        this.paused = false;
+        Time.timeScale = 1.0f;
+        SoundManager.instance.unpause();
+    }
+
+    private void spawnPlayers() {
+        LevelManager level = LevelManager.instance;
+        int numPlayers = level.numPlayers;
+
+        Debug.Log("Spawning " + numPlayers + " players!");
+
+        for (int i = 0; i < numPlayers; ++i) {
+            GameObject player = (GameObject)Instantiate(playerPrefab);
+            playerRefs.Add(player);
+            player.GetComponent<InputController>().axisName = "Player" + (i+1) + "_";
+            player.transform.position = level.spawnPointForPlayer(i);
+        }
+    }
+
+    private void spawnTorch() {
+        LevelManager level = LevelManager.instance;
+        TileLocation torchLoc;
+        do {
+            torchLoc = level.tiles.random ();
+        } while (level.isBadPlaceForThings(torchLoc));
+        Vector3 torchPos = level.centerOfTile(torchLoc);
+        Instantiate(this.torchPrefab, torchPos, Quaternion.identity);
+    }
 
     void setLightning(float intensity) {
         this.lightning.GetComponent<Light>().intensity = intensity;
@@ -245,12 +377,12 @@ public class GameManager : MonoBehaviour {
     }
 
     void openDoor() {
-        this.isDoorOpen = true;
+        this._isDoorOpen = true;
         GameObject.FindWithTag("Door").GetComponent<MeshRenderer>().material = this.openDoorMaterial;
     }
 
     void closeDoor() {
-        this.isDoorOpen = false;
+        this._isDoorOpen = false;
         GameObject.FindWithTag("Door").GetComponent<MeshRenderer>().material = this.closedDoorMaterial;
     }
 
@@ -275,7 +407,7 @@ public class GameManager : MonoBehaviour {
 
     public void doorTouched(GameObject player) {
         if (this.isDoorOpen) {
-            this.winCondition = true;
+            this._winCondition = true;
             this.RemovePlayer(player, false);
         }
     }

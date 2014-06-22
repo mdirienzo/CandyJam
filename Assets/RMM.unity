@@ -585,9 +585,6 @@ MonoBehaviour:
   - {fileID: 100000, guid: ce520276965444513b7437157403bc09, type: 2}
   trapPrefabs:
   - {fileID: 100000, guid: 6a0627002ed0349da9f2b7000006ab9a, type: 2}
-  columns: 19
-  rows: 14
-  initNumPlayers: 4
 --- !u!4 &1664196824
 Transform:
   m_ObjectHideFlags: 0
@@ -634,11 +631,10 @@ MonoBehaviour:
   explodey: {fileID: 100004, guid: acb381b49b4c930408b9c5c77c54f600, type: 2}
   closedDoorMaterial: {fileID: 2100000, guid: 9b0486b4b5dcd4edb9ea6a3f3bdc96f8, type: 2}
   openDoorMaterial: {fileID: 2100000, guid: 3d152977f996c4071a0a9fd140a9e7e4, type: 2}
+  initNumPlayers: 1
+  initColumns: 19
+  initRows: 14
   playerRefs: []
-  isDark: 0
-  isDoorOpen: 0
-  timeUntilDark: 20
-  winCondition: 0
 --- !u!4 &2039978338
 Transform:
   m_ObjectHideFlags: 0

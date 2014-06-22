@@ -14,23 +14,36 @@ public class LevelManager : MonoBehaviour {
     public GameObject[] xWallPrefabs;
     public GameObject[] yWallPrefabs;
     public GameObject[] trapPrefabs;
-    public int columns;
-    public int rows;
 
     public BoundedTiles tiles;
     private bool[] trappedTiles;
     private GameObject xClipWallPrefab = null;
     private GameObject yClipWallPrefab = null;
 
-    void Awake() {
-        this.numPlayers = initNumPlayers;
-        this.tiles = new BoundedTiles(new TileLocation(rows, columns));
-        LevelManager.instance = this;
+    private string[] managedTags = new string[] {
+        "Wall",
+        "Floor",
+        "Trap"
+    };
+
+
+    public void Awake() {
+        // just make sure they have some sensible values. the game manager should beginRound() with the real values before it matters though
+        this._rows = 10;
+        this._columns = 10;
+        this._numPlayers = 1;
+
+        if (instance == null) {
+            instance = this;
+        } else {
+            Debug.LogError("Only one copy of levelmanager allowed!");
+        }
+
         this.xClipWallPrefab = (GameObject)Resources.Load("x-clip-wall", typeof(GameObject));
         this.yClipWallPrefab = (GameObject)Resources.Load("y-clip-wall", typeof(GameObject));
     }
 
-	void Start() {
+	public void Start() {
 		Debug.Log("LevelManager Start");
 
 		// prevalidate that the tile types are populate correctly, otherwise we won't be able to make the map
@@ -38,33 +51,50 @@ public class LevelManager : MonoBehaviour {
             Debug.LogError("Level manager not configured correctly and cannot start.");
             return;
         }
-
-        this.buildMap();
-        this.positionBorder();
-        this.positionCameraAndLight();
 	}
 
-	void Update() { }
+	public void Update() { }
 
-public int initNumPlayers;
+    public void beginRound(int numPlayers, int rows, int columns) {
+        this.endRound();
+
+        this._rows = rows;
+        this._columns = columns;
+        this._numPlayers = numPlayers;
+        this.tiles = new BoundedTiles(new TileLocation(this.rows, this.columns));
+        this.computeSpawnRegion();
+        this.positionBorder();
+        this.positionCameraAndLight();
+        this.buildMap();
+    }
+
+    public void endRound() {
+        foreach (string tag in this.managedTags) {
+            foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag)) {
+                Destroy(obj);
+            }
+        }
+    }
+
+    private int _rows;
+    private int _columns;
     private int _numPlayers;
 
     public int numPlayers {
         get { return _numPlayers; }
-        set { _numPlayers = value; _spawnRegion = null; }
+    }
+
+    public int rows {
+        get { return _rows; }
+    }
+
+    public int columns {
+        get { return _columns; }
     }
 
     private List<TileLocation> _spawnRegion = null;
 
-    public List<TileLocation> spawnRegion {
-        get {
-            if (this._spawnRegion == null) {
-                this.computeSpawnRegion();
-            }
-
-            return this._spawnRegion;
-        }
-    }
+    public List<TileLocation> spawnRegion { get { return _spawnRegion; } }
 
     private void computeSpawnRegion() {
         List<TileLocation> l = new List<TileLocation>();
@@ -283,16 +313,6 @@ public int initNumPlayers;
                 Debug.LogError("Trap prefab #" + i + " not set.");
                 invalidConfiguration = true;
             }
-        }
-
-        // and the row/column count
-        if (this.tiles.bound.r <= 2) {
-            Debug.LogError("Invalid row count.");
-            invalidConfiguration = true;
-        }
-        if (this.tiles.bound.c <= 2) {
-            Debug.LogError("Invalid column count.");
-            invalidConfiguration = true;
         }
 
         return !invalidConfiguration;
