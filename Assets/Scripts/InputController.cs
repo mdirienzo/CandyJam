@@ -8,7 +8,6 @@ public class InputController : MonoBehaviour {
 	private float maxVelocity = 2;
 
 	private Animator anim;
-	private bool isMoving = false;
 
 	// Use this for initialization
 	void Start () {
