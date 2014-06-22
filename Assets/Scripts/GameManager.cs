@@ -222,6 +222,14 @@ public class GameManager : MonoBehaviour {
             this._isDark = true;
             this.Invoke("flashLightning1", 0.5f);
         }
+
+        if (Input.GetKeyUp(KeyCode.Escape) || Input.GetButtonUp("Pause")) {
+            if (this.paused) {
+                this.unpause();
+            } else {
+                this.pause();
+            }
+        }
     }
 
     public void newRound() {
