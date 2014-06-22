@@ -5,4 +5,5 @@ Stuff still to do
 [ ] Different character sprites for each player
 [ ] Have ghosts vanish and reappear after a bit of chasing
 [ ] Add flashlight
+[ ] Change name to Candy Crypt
 
