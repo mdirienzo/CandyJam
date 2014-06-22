@@ -585,8 +585,8 @@ MonoBehaviour:
   - {fileID: 100000, guid: ce520276965444513b7437157403bc09, type: 2}
   trapPrefabs:
   - {fileID: 100000, guid: 6a0627002ed0349da9f2b7000006ab9a, type: 2}
-  columns: 10
-  rows: 10
+  columns: 19
+  rows: 14
 --- !u!4 &1664196824
 Transform:
   m_ObjectHideFlags: 0
@@ -626,8 +626,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea581cd46b750b24f8bcf680bf9ad0f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numPlayers: 1
-  keysRequired: 1
+  numPlayers: 2
   numGhosts: 1
   ghostsPerPlayer: 1
   playerPrefab: {fileID: 100002, guid: ce0764a516499a346bd4043dfab3c965, type: 2}
