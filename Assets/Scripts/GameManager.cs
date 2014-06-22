@@ -4,8 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
-	public int numPlayers;
-    private int keysRequired = 1;
     public int numGhosts = 1;
     public int ghostsPerPlayer = 1;
 	public GameObject playerPrefab;
@@ -36,6 +34,14 @@ public class GameManager : MonoBehaviour {
     public float timeUntilDark = 15;
     public bool winCondition = false;
 
+    public int numPlayers {
+        get { return LevelManager.instance.numPlayers; }
+    }
+
+    public int keysRequired {
+        get { return LevelManager.instance.numPlayers; }
+    }
+
 	void Awake() {
 		this.playerRefs = new List<GameObject> ();
 
@@ -59,6 +65,9 @@ public class GameManager : MonoBehaviour {
 
 
 	void Start() {
+        LevelManager level = LevelManager.instance;
+        int numPlayers = level.numPlayers;
+
         this.sun = GameObject.FindWithTag("Sun");
         if (this.sun == null) {
             Debug.LogError("No sun!");
@@ -87,36 +96,27 @@ public class GameManager : MonoBehaviour {
 		if (playerPrefab == null) {
 			Debug.LogError ("Player prefab not set!");
 		} else {
-			if(numPlayers < 1){
-				Debug.LogError ("Players = 0! :(");
-			}else{
-				Debug.Log ("Spawning " + numPlayers + " players!");
-				//spawn players based on size of map
+			Debug.Log ("Spawning " + numPlayers + " players!");
+			//spawn players based on size of map
 
-				//playerRefs = new GameObject[numPlayers];
+			//playerRefs = new GameObject[numPlayers];
 
-				for(int i = 0; i < numPlayers; i++){
-					GameObject player = (GameObject)Instantiate(playerPrefab);
-					playerRefs.Add (player);
-					player.GetComponent<InputController>().axisName = "Player" + (i+1) + "_";
-					//playerRefs[i] = Instantiate(playerPrefab) as GameObject;
-					player.transform.position = LevelManager.instance.centerOfMap;
-
-					//playerRefs[i].transform.position+= (Vector3.back);
-				}
+			for (int i = 0; i < numPlayers; ++i) {
+				GameObject player = (GameObject)Instantiate(playerPrefab);
+				playerRefs.Add(player);
+				player.GetComponent<InputController>().axisName = "Player" + (i+1) + "_";
+				player.transform.position = level.spawnPointForPlayer(i);
 			}
 		}
 
-		keysRequired = numPlayers;
-        LevelManager level = LevelManager.instance;
 		if (numPlayers > 1) {
-						TileLocation torchLoc;
-						do {
-								torchLoc = level.tiles.random ();
-						} while (level.isTrapped(torchLoc));
-						Vector3 torchPos = level.centerOfTile (torchLoc);
-						Instantiate (this.torchPrefab, torchPos, Quaternion.identity);
-				}
+    		TileLocation torchLoc;
+    		do {
+				torchLoc = level.tiles.random ();
+    		} while (level.isBadPlaceForThings(torchLoc));
+    		Vector3 torchPos = level.centerOfTile (torchLoc);
+    		Instantiate (this.torchPrefab, torchPos, Quaternion.identity);
+    	}
 	}
 
     void OnGUI() {
@@ -229,7 +229,7 @@ public class GameManager : MonoBehaviour {
                 case CardinalDir.SOUTH: loc = new TileLocation(level.tiles.bound.r-1, RNG.random.Next(level.tiles.bound.c)); rot.eulerAngles = new Vector3(0.0f, 0.0f, 90.0f); break;
                 default:                loc = new TileLocation(RNG.random.Next(level.tiles.bound.r), level.tiles.bound.c-1); break;
             }
-        } while (level.isTrapped(loc));
+        } while (level.isBadPlaceForThings(loc));
 
         Instantiate(this.doorPrefab, level.centerOfTile(loc), rot);
         this.closeDoor();
@@ -237,7 +237,7 @@ public class GameManager : MonoBehaviour {
         for (int i = 0; i < keysRequired; ++i) {
             do {
                 loc = level.tiles.random();
-            } while (level.isTrapped(loc));
+            } while (level.isBadPlaceForThings(loc));
             Vector3 pos = level.centerOfTile(loc);
             GameObject key = (GameObject)Instantiate(this.keyPrefab, pos, Quaternion.identity);
             key.name = "Key " + i;

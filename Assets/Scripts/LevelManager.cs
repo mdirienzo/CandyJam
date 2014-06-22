@@ -23,6 +23,7 @@ public class LevelManager : MonoBehaviour {
     private GameObject yClipWallPrefab = null;
 
     void Awake() {
+        this.numPlayers = initNumPlayers;
         this.tiles = new BoundedTiles(new TileLocation(rows, columns));
         LevelManager.instance = this;
         this.xClipWallPrefab = (GameObject)Resources.Load("x-clip-wall", typeof(GameObject));
@@ -45,12 +46,52 @@ public class LevelManager : MonoBehaviour {
 
 	void Update() { }
 
-    public TileLocation spawnPoint {
-        get { return new TileLocation(this.tiles.bound.r / 2, this.tiles.bound.c / 2); }
+public int initNumPlayers;
+    private int _numPlayers;
+
+    public int numPlayers {
+        get { return _numPlayers; }
+        set { _numPlayers = value; _spawnRegion = null; }
     }
 
-    public Vector3 centerOfMap {
-        get { return this.centerOfTile(this.spawnPoint); }
+    private List<TileLocation> _spawnRegion = null;
+
+    public List<TileLocation> spawnRegion {
+        get {
+            if (this._spawnRegion == null) {
+                this.computeSpawnRegion();
+            }
+
+            return this._spawnRegion;
+        }
+    }
+
+    private void computeSpawnRegion() {
+        List<TileLocation> l = new List<TileLocation>();
+        int columns = (int)Mathf.Ceil(Mathf.Sqrt(this._numPlayers));
+        int rows = (int)Mathf.Ceil((float)this._numPlayers / (float)columns);
+
+        TileLocation center = new TileLocation(this.tiles.bound.r / 2, this.tiles.bound.c / 2);
+        TileLocation upperLeft = new TileLocation(center.r - rows / 2, center.c - columns / 2);
+        TileLocation upperRight = new TileLocation(upperLeft.r, upperLeft.c + columns-1);
+        TileLocation pos = upperLeft;
+
+        for (int i = 0; i < this._numPlayers; ++i) {
+            l.Add(pos);
+            Debug.Log("Spawn point of player " + i + " = " + pos);
+            int c = pos.c + 1;
+            if (c > upperRight.c) {
+                pos = new TileLocation(pos.r + 1, upperLeft.c);
+            } else {
+                pos = new TileLocation(pos.r, c);
+            }
+        }
+
+        this._spawnRegion = l;
+    }
+
+    public Vector3 spawnPointForPlayer(int playerNumber) {
+        return this.centerOfTile(this.spawnRegion[playerNumber]);
     }
 
     public Vector3 trueCenterOfMap {
@@ -75,8 +116,8 @@ public class LevelManager : MonoBehaviour {
         get { return this.centerOfTile(this.tiles.extent) + new Vector3(0.5f, 0.5f, 0.0f); }
     }
 
-    public bool isTrapped(TileLocation l) {
-        return this.trappedTiles[this.tiles.indexOf(l)];
+    public bool isBadPlaceForThings(TileLocation l) {
+        return this.trappedTiles[this.tiles.indexOf(l)] || this.spawnRegion.Contains(l);
     }
 
     private void buildMap() {
@@ -95,7 +136,7 @@ public class LevelManager : MonoBehaviour {
         this.trappedTiles = new bool[this.tiles.count];
         for (int i = 0; i < (this.tiles.bound.r * this.tiles.bound.c) * 0.05f; ++i) {
             TileLocation l;
-            do { l = this.tiles.random(); } while (l == this.spawnPoint);
+            do { l = this.tiles.random(); } while (this.spawnRegion.Contains(l));
 
             this.trappedTiles[this.tiles.indexOf(l)] = true;
 
@@ -103,12 +144,12 @@ public class LevelManager : MonoBehaviour {
             Instantiate(trapPrefab, this.centerOfTile(l), Quaternion.identity);
         }
 
-        TileWall[] walls = new WallBuilder (
-            extraWalks: 0,
-            impassable: this.trappedTiles,
-            tiles:      this.tiles,
-            spawnPoint: this.spawnPoint,
-            rng:        rng
+        TileWall[] walls = new RandomWalkWallBuilder (
+            extraWalks:  0,
+            impassable:  this.trappedTiles,
+            tiles:       this.tiles,
+            spawnRegion: this.spawnRegion,
+            rng:         rng
         ).build();
 
         foreach (TileLocation l in this.tiles.all) {
@@ -258,11 +299,11 @@ public class LevelManager : MonoBehaviour {
     }
 }
 
-public class WallBuilder {
+public class RandomWalkWallBuilder {
     private int extraWalks;
     private bool[] impassable;
     private BoundedTiles tiles;
-    private TileLocation spawnPoint;
+    private List<TileLocation> spawnRegion;
     private TileWall[] walls;
     private bool[] reachable;
     private bool[] flood;
@@ -270,11 +311,11 @@ public class WallBuilder {
     private List<TileLocation> randomLocations;
     private IEnumerator<TileLocation> randomLocationEnumerator;
 
-    public WallBuilder(int extraWalks, bool[] impassable, BoundedTiles tiles, TileLocation spawnPoint, System.Random rng) {
+    public RandomWalkWallBuilder(int extraWalks, bool[] impassable, BoundedTiles tiles, List<TileLocation> spawnRegion, System.Random rng) {
         this.extraWalks = extraWalks;
         this.impassable = impassable;
         this.tiles = tiles;
-        this.spawnPoint = spawnPoint;
+        this.spawnRegion = spawnRegion;
         this.walls = new TileWall[this.tiles.count];
         this.reachable = new bool[this.tiles.count];
         this.flood = new bool[this.tiles.count];
@@ -314,6 +355,15 @@ public class WallBuilder {
 
 
     public TileWall[] build() {
+        TileLocation spawnRegionNE = TileLocation.zero;
+        foreach (TileLocation l in this.spawnRegion) {
+            spawnRegionNE = new TileLocation(Mathf.Max(spawnRegionNE.r, l.r), Mathf.Max(spawnRegionNE.c, l.c));
+        }
+
+        foreach (TileLocation l in this.spawnRegion) {
+            if (l.r != spawnRegionNE.r) this.walls[this.tiles.indexOf(l)].north = false;
+            if (l.c != spawnRegionNE.c) this.walls[this.tiles.indexOf(l)].east  = false;
+        }
 
         // create walls. start by making everything a wall, then pick random points and
         // randomly walk from them bashing down walls for a finite number of steps. in
@@ -322,7 +372,8 @@ public class WallBuilder {
 
         int walks = 0;
         while (walks < 400) {
-            this.markReachable(this.spawnPoint, this.reachable);
+            this.markReachable(this.spawnRegion, this.reachable);
+
             TileLocation isolatedLocation = this.findIsolatedLocation(); // to off 'em
 
             if (isolatedLocation == TileLocation.notFound) {
@@ -372,7 +423,7 @@ public class WallBuilder {
             if (this.impassable[locIndex] || this.reachable[locIndex]) {
                 continue;
             }
-            this.markReachable(loc, this.flood);
+            this.markReachable(new TileLocation[] { loc }, this.flood);
             int reach = 0;
             for (int i = 0; i < this.flood.Length; ++i) {
                 if (this.flood[i]) { reach += 1; }
@@ -395,12 +446,14 @@ public class WallBuilder {
         }
     }
 
-    private void markReachable(TileLocation initial, bool[] marks) {
+    private void markReachable(IEnumerable<TileLocation> initial, bool[] marks) {
         for (int i = 0; i < marks.Length; ++i) {
             marks[i] = false;
         }
 
-        marks[this.tiles.indexOf(initial)] = true;
+        foreach (TileLocation loc in initial) {
+            marks[this.tiles.indexOf(loc)] = true;
+        }
 
         bool updated;
         do {
