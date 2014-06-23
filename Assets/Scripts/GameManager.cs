@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour {
         rows              = 14,
         columns           = 19,
         trapFraction      =  0.05f,
-        extraPathFraction =  0.1f,
+        extraPathFraction =  0.25f,
         keyFraction       =  1.0f
     };
 
