@@ -408,24 +408,8 @@ public class GameManager : MonoBehaviour {
     void spawnGhosts() {
 		//har har har
 		//SoundManager.instance.Laugh ();
-        LevelManager level = LevelManager.instance;
         for (int i = 0; i < numGhosts + numPlayers * this.ghostsPerPlayer; ++i) {
-            Vector3 pos;
-            float nearestDistance;
-            do {
-                nearestDistance = 0.0f;
-                pos = level.centerOfTile(level.tiles.random());
-                GameObject nearestPlayer = null;
-                foreach (GameObject player in playerRefs) {
-                    float distance = Vector3.Distance(player.transform.position, pos);
-                    if (nearestPlayer == null || distance < nearestDistance) {
-                        nearestPlayer = player;
-                        nearestDistance = distance;
-                    }
-                }
-            } while (nearestDistance <= 1.0f);
-
-            GameObject ghost = (GameObject)Instantiate(ghostPrefab, pos, Quaternion.identity);
+            GameObject ghost = (GameObject)Instantiate(ghostPrefab, Vector3.zero, Quaternion.identity);
             ghost.name = "Ghost " + i;
         }
     }

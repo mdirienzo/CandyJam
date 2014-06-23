@@ -20,6 +20,8 @@ public class PlayerManager : MonoBehaviour {
             GameManager.instance.doorTouched(this.gameObject);
         } else if (collision.gameObject.tag == "Torch") {
             GameManager.instance.torchPickedUp(this.gameObject, collision.gameObject);
+        } else if (collision.gameObject.tag == "Ghost") {
+            GameManager.instance.RemovePlayer(this.gameObject, true);
         }
 	}
 }
