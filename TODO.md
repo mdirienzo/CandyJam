@@ -4,7 +4,6 @@ Stuff still to do
 - [X] Keyboard support for movement
 - [ ] Different character sprites for each player
 - [X] Have ghosts vanish and reappear after a bit of chasing
-- [ ] Have ghosts vanish and reappear after a bit of chasing
 - [X] Kill on ghost touch even when not moving
 - [ ] Add flashlight
 - [X] Change name to Candy Crypt
