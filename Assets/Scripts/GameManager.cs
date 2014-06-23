@@ -133,8 +133,9 @@ public class GameManager : MonoBehaviour {
             countStyle.alignment = TextAnchor.MiddleCenter;
             countStyle.fontSize = 20;
 
-            int height = this.debugBuild ? 240 + (3*40) : 240;
-            GUI.BeginGroup(new Rect(Screen.width/2 - 100, Screen.height/2 - height/2, 200, height));
+            int height = 280;
+            int width = 200 + (this.debugBuild ? 250 : 0);
+            GUI.BeginGroup(new Rect(Screen.width/2 - width/2, Screen.height/2 - height/2, width, height));
 
             int y = 0;
 
@@ -159,6 +160,29 @@ public class GameManager : MonoBehaviour {
 
             y += 40;
 
+            if (GUI.Button(new Rect(0, y, 50, 40), "Easy")) {
+                this.nextLevelParameters.trapFraction = 0.05f;
+                this.nextLevelParameters.extraPathFraction = 0.35f;
+                this.nextLevelParameters.keyFraction = 1.0f;
+            }
+            if (GUI.Button(new Rect(50, y, 50, 40), "Med.")) {
+                this.nextLevelParameters.trapFraction = 0.05f;
+                this.nextLevelParameters.extraPathFraction = 0.25f;
+                this.nextLevelParameters.keyFraction = 1.0f;
+            }
+            if (GUI.Button(new Rect(100, y, 50, 40), "Hard")) {
+                this.nextLevelParameters.trapFraction = 0.05f;
+                this.nextLevelParameters.extraPathFraction = 0.15f;
+                this.nextLevelParameters.keyFraction = 1.25f;
+            }
+            if (GUI.Button(new Rect(150, y, 50, 40), "Noooo")) {
+                this.nextLevelParameters.trapFraction = 0.05f;
+                this.nextLevelParameters.extraPathFraction = 0.1f;
+                this.nextLevelParameters.keyFraction = 1.5f;
+            }
+
+            y += 40;
+
             if (GUI.Button(new Rect(0, y, 40, 40), "-") && this.nextLevelParameters.columns > 10) {
                 --this.nextLevelParameters.columns;
             }
@@ -179,38 +203,6 @@ public class GameManager : MonoBehaviour {
 
             y += 40;
 
-            if (this.debugBuild) {
-                if (GUI.Button(new Rect(0, y, 40, 40), "-") && this.nextLevelParameters.keyFraction > 1.0f) {
-                    this.nextLevelParameters.keyFraction -= 0.25f;
-                }
-                GUI.Label(new Rect(40, y, 120, 40), this.nextLevelParameters.keyFraction + " Key cf", countStyle);
-                if (GUI.Button(new Rect(160, y, 40, 40), "+") && this.nextLevelParameters.keyFraction < 5.0f) {
-                    this.nextLevelParameters.keyFraction += 0.25f;
-                }
-
-                y += 40;
-
-                if (GUI.Button(new Rect(0, y, 40, 40), "-") && this.nextLevelParameters.trapFraction > 0.01f) {
-                    this.nextLevelParameters.trapFraction -= 0.01f;
-                }
-                GUI.Label(new Rect(40, y, 120, 40), this.nextLevelParameters.trapFraction + " Trap cf", countStyle);
-                if (GUI.Button(new Rect(160, y, 40, 40), "+") && this.nextLevelParameters.trapFraction < 0.25f) {
-                    this.nextLevelParameters.trapFraction += 0.01f;
-                }
-
-                y += 40;
-
-                if (GUI.Button(new Rect(0, y, 40, 40), "-") && this.nextLevelParameters.extraPathFraction > 0.0f) {
-                    this.nextLevelParameters.extraPathFraction -= 0.05f;
-                }
-                GUI.Label(new Rect(40, y, 120, 40), this.nextLevelParameters.extraPathFraction + " Path cf", countStyle);
-                if (GUI.Button(new Rect(160, y, 40, 40), "+") && this.nextLevelParameters.extraPathFraction < 0.5f) {
-                    this.nextLevelParameters.extraPathFraction += 0.05f;
-                }
-
-                y += 40;
-            }
-
             if (GUI.Button(new Rect(0, y, 200, 40), "Apply / Restart")) {
                 this.unpause();
                 newRound();
@@ -220,6 +212,40 @@ public class GameManager : MonoBehaviour {
 
             if (GUI.Button(new Rect(0, y, 200, 40), "Quit")) {
                 Application.Quit();
+            }
+
+            if (this.debugBuild) {
+                y = 0;
+
+                if (GUI.Button(new Rect(250, y, 40, 40), "-") && this.nextLevelParameters.keyFraction > 1.0f) {
+                    this.nextLevelParameters.keyFraction -= 0.25f;
+                }
+                GUI.Label(new Rect(290, y, 120, 40), this.nextLevelParameters.keyFraction + " Key cf", countStyle);
+                if (GUI.Button(new Rect(410, y, 40, 40), "+") && this.nextLevelParameters.keyFraction < 5.0f) {
+                    this.nextLevelParameters.keyFraction += 0.25f;
+                }
+
+                y += 40;
+
+                if (GUI.Button(new Rect(250, y, 40, 40), "-") && this.nextLevelParameters.trapFraction > 0.01f) {
+                    this.nextLevelParameters.trapFraction -= 0.01f;
+                }
+                GUI.Label(new Rect(290, y, 120, 40), this.nextLevelParameters.trapFraction + " Trap cf", countStyle);
+                if (GUI.Button(new Rect(410, y, 40, 40), "+") && this.nextLevelParameters.trapFraction < 0.25f) {
+                    this.nextLevelParameters.trapFraction += 0.01f;
+                }
+
+                y += 40;
+
+                if (GUI.Button(new Rect(250, y, 40, 40), "-") && this.nextLevelParameters.extraPathFraction > 0.0f) {
+                    this.nextLevelParameters.extraPathFraction -= 0.05f;
+                }
+                GUI.Label(new Rect(290, y, 120, 40), this.nextLevelParameters.extraPathFraction + " Path cf", countStyle);
+                if (GUI.Button(new Rect(410, y, 40, 40), "+") && this.nextLevelParameters.extraPathFraction < 0.5f) {
+                    this.nextLevelParameters.extraPathFraction += 0.05f;
+                }
+
+                y += 40;
             }
 
             GUI.EndGroup();

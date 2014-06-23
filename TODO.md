@@ -7,7 +7,7 @@ Stuff still to do
 - [ ] Kill on ghost touch even when not moving
 - [ ] Add flashlight
 - [X] Change name to Candy Crypt
-- [ ] Difficulty levels. easy => {t=0.05 p=0.35 k=1.0}, medium => {t=0.05 p=0.25 k=1.0}, hard => {t=0.05 p=0.15 k=1.25}, impossible => {t=0.05 p=0.1 k=1.5}
+- [X] Difficulty levels. easy => {t=0.05 p=0.35 k=1.0}, medium => {t=0.05 p=0.25 k=1.0}, hard => {t=0.05 p=0.15 k=1.25}, impossible => {t=0.05 p=0.1 k=1.5}
 - [ ] Key progression
 - [ ] Single player: show torch after dark
 - [ ] Increase volume of creepy music
