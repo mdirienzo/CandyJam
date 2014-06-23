@@ -624,6 +624,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea581cd46b750b24f8bcf680bf9ad0f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debugBuild: 1
   numGhosts: 1
   ghostsPerPlayer: 1
   playerPrefab: {fileID: 100002, guid: ce0764a516499a346bd4043dfab3c965, type: 2}
@@ -631,9 +632,13 @@ MonoBehaviour:
   explodey: {fileID: 100004, guid: acb381b49b4c930408b9c5c77c54f600, type: 2}
   closedDoorMaterial: {fileID: 2100000, guid: 9b0486b4b5dcd4edb9ea6a3f3bdc96f8, type: 2}
   openDoorMaterial: {fileID: 2100000, guid: 3d152977f996c4071a0a9fd140a9e7e4, type: 2}
-  initNumPlayers: 1
-  initColumns: 19
-  initRows: 14
+  initLevelParameters:
+    keyFraction: 1
+    extraPathFraction: .100000001
+    trapFraction: .0500000007
+    players: 1
+    rows: 14
+    columns: 19
   playerRefs: []
 --- !u!4 &2039978338
 Transform:

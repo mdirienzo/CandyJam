@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
+    public bool debugBuild = true;
     public int numGhosts = 1;
     public int ghostsPerPlayer = 1;
 	public GameObject playerPrefab;
@@ -11,9 +12,14 @@ public class GameManager : MonoBehaviour {
 	public GameObject explodey;
     public Material closedDoorMaterial;
     public Material openDoorMaterial;
-    public int initNumPlayers = 1;
-    public int initColumns = 19;
-    public int initRows = 14;
+    public LevelParameters initLevelParameters = new LevelParameters {
+        players           =  1,
+        rows              = 14,
+        columns           = 19,
+        trapFraction      =  0.05f,
+        extraPathFraction =  0.1f,
+        keyFraction       =  1.0f
+    };
 
 	public static GameManager instance;
 
@@ -43,9 +49,7 @@ public class GameManager : MonoBehaviour {
     public float timeUntilDark { get { return _timeUntilDark; } }
     public bool winCondition { get { return _winCondition; } }
 
-    private int nextNumPlayers;
-    private int nextRows;
-    private int nextColumns;
+    private LevelParameters nextLevelParameters;
 
     private string[] managedTags = new string[] {
         "Ghost",
@@ -56,19 +60,17 @@ public class GameManager : MonoBehaviour {
     };
 
     public int numPlayers {
-        get { return LevelManager.instance.numPlayers; }
+        get { return LevelManager.instance.parameters.players; }
     }
 
     public int keysRequired {
-        get { return LevelManager.instance.numPlayers; }
+        get { return (int)Mathf.Ceil(LevelManager.instance.parameters.players * LevelManager.instance.parameters.keyFraction); }
     }
 
 	public void Awake() {
 		this.playerRefs = new List<GameObject>();
 
-        this.nextNumPlayers = this.initNumPlayers;
-        this.nextRows = this.initRows;
-        this.nextColumns = this.initColumns;
+        this.nextLevelParameters = this.initLevelParameters;
 
         if (instance == null) {
             instance = this;
@@ -117,7 +119,7 @@ public class GameManager : MonoBehaviour {
 			Debug.LogError ("Player prefab not set!");
 		}
 
-        this.beginRound(this.initNumPlayers, this.initRows, this.initColumns);
+        this.newRound();
     }
 
     public void OnGUI() {
@@ -131,46 +133,92 @@ public class GameManager : MonoBehaviour {
             countStyle.alignment = TextAnchor.MiddleCenter;
             countStyle.fontSize = 20;
 
-            GUI.BeginGroup(new Rect(Screen.width / 2 - 100, Screen.height / 2 - 120, 200, 240));
-            if (GUI.Button(new Rect(0, 0, 200, 40), "Unpause")) {
+            int height = this.debugBuild ? 240 + (3*40) : 240;
+            GUI.BeginGroup(new Rect(Screen.width/2 - 100, Screen.height/2 - height/2, 200, height));
+
+            int y = 0;
+
+            if (GUI.Button(new Rect(0, y, 200, 40), "Unpause")) {
                 this.unpause();
             }
 
-            if (GUI.Button(new Rect(0, 40, 50, 40), "1P")) {
-                this.nextNumPlayers = 1;
+            y += 40;
+
+            if (GUI.Button(new Rect(0, y, 50, 40), "1P")) {
+                this.nextLevelParameters.players = 1;
             }
-            if (GUI.Button(new Rect(50, 40, 50, 40), "2P")) {
-                this.nextNumPlayers = 2;
+            if (GUI.Button(new Rect(50, y, 50, 40), "2P")) {
+                this.nextLevelParameters.players = 2;
             }
-            if (GUI.Button(new Rect(100, 40, 50, 40), "3P")) {
-                this.nextNumPlayers = 3;
+            if (GUI.Button(new Rect(100, y, 50, 40), "3P")) {
+                this.nextLevelParameters.players = 3;
             }
-            if (GUI.Button(new Rect(150, 40, 50, 40), "4P")) {
-                this.nextNumPlayers = 4;
+            if (GUI.Button(new Rect(150, y, 50, 40), "4P")) {
+                this.nextLevelParameters.players = 4;
             }
 
-            if (GUI.Button(new Rect(0, 80, 40, 40), "-") && this.nextColumns > 10) {
-                --this.nextColumns;
+            y += 40;
+
+            if (GUI.Button(new Rect(0, y, 40, 40), "-") && this.nextLevelParameters.columns > 10) {
+                --this.nextLevelParameters.columns;
             }
-            GUI.Label(new Rect(40, 80, 120, 40), this.nextColumns + " Columns", countStyle);
-            if (GUI.Button(new Rect(160, 80, 40, 40), "+") && this.nextColumns < 100) {
-                ++this.nextColumns;
+            GUI.Label(new Rect(40, y, 120, 40), this.nextLevelParameters.columns + " Columns", countStyle);
+            if (GUI.Button(new Rect(160, y, 40, 40), "+") && this.nextLevelParameters.columns < 100) {
+                ++this.nextLevelParameters.columns;
             }
 
-            if (GUI.Button(new Rect(0, 120, 40, 40), "-") && this.nextRows > 10) {
-                --this.nextRows;
+            y += 40;
+
+            if (GUI.Button(new Rect(0, y, 40, 40), "-") && this.nextLevelParameters.rows > 10) {
+                --this.nextLevelParameters.rows;
             }
-            GUI.Label(new Rect(40, 120, 120, 40), this.nextRows + " Rows", countStyle);
-            if (GUI.Button(new Rect(160, 120, 40, 40), "+") && this.nextRows < 100) {
-                ++this.nextRows;
+            GUI.Label(new Rect(40, y, 120, 40), this.nextLevelParameters.rows + " Rows", countStyle);
+            if (GUI.Button(new Rect(160, y, 40, 40), "+") && this.nextLevelParameters.rows < 100) {
+                ++this.nextLevelParameters.rows;
             }
 
-            if (GUI.Button(new Rect(0, 160, 200, 40), "Apply / Restart")) {
+            y += 40;
+
+            if (this.debugBuild) {
+                if (GUI.Button(new Rect(0, y, 40, 40), "-") && this.nextLevelParameters.keyFraction > 1.0f) {
+                    this.nextLevelParameters.keyFraction -= 0.25f;
+                }
+                GUI.Label(new Rect(40, y, 120, 40), this.nextLevelParameters.keyFraction + " Key cf", countStyle);
+                if (GUI.Button(new Rect(160, y, 40, 40), "+") && this.nextLevelParameters.keyFraction < 5.0f) {
+                    this.nextLevelParameters.keyFraction += 0.25f;
+                }
+
+                y += 40;
+
+                if (GUI.Button(new Rect(0, y, 40, 40), "-") && this.nextLevelParameters.trapFraction > 0.01f) {
+                    this.nextLevelParameters.trapFraction -= 0.01f;
+                }
+                GUI.Label(new Rect(40, y, 120, 40), this.nextLevelParameters.trapFraction + " Trap cf", countStyle);
+                if (GUI.Button(new Rect(160, y, 40, 40), "+") && this.nextLevelParameters.trapFraction < 0.25f) {
+                    this.nextLevelParameters.trapFraction += 0.01f;
+                }
+
+                y += 40;
+
+                if (GUI.Button(new Rect(0, y, 40, 40), "-") && this.nextLevelParameters.extraPathFraction > 0.0f) {
+                    this.nextLevelParameters.extraPathFraction -= 0.05f;
+                }
+                GUI.Label(new Rect(40, y, 120, 40), this.nextLevelParameters.extraPathFraction + " Path cf", countStyle);
+                if (GUI.Button(new Rect(160, y, 40, 40), "+") && this.nextLevelParameters.extraPathFraction < 0.5f) {
+                    this.nextLevelParameters.extraPathFraction += 0.05f;
+                }
+
+                y += 40;
+            }
+
+            if (GUI.Button(new Rect(0, y, 200, 40), "Apply / Restart")) {
                 this.unpause();
                 newRound();
             }
 
-            if (GUI.Button(new Rect(0, 200, 200, 40), "Quit")) {
+            y += 40;
+
+            if (GUI.Button(new Rect(0, y, 200, 40), "Quit")) {
                 Application.Quit();
             }
 
@@ -194,7 +242,7 @@ public class GameManager : MonoBehaviour {
                 text = "YOU LOSE!";
             }
 
-            GUI.Label(new Rect(Screen.width / 2 - 50, Screen.height / 2 - 25, 100, 50), text, style);
+            GUI.Label(new Rect(Screen.width/2 - 50, Screen.height/2 - 25, 100, 50), text, style);
         }
     }
 
@@ -233,14 +281,14 @@ public class GameManager : MonoBehaviour {
     }
 
     public void newRound() {
-        this.beginRound(this.nextNumPlayers, this.nextRows, this.nextColumns);
+        this.beginRound(this.nextLevelParameters);
     }
 
-    public void beginRound(int numPlayers, int rows, int columns) {
+    public void beginRound(LevelParameters levelParameters) {
         this.endRound();
 
         LevelManager level = LevelManager.instance;
-        level.beginRound(numPlayers, rows, columns);
+        level.beginRound(levelParameters);
         this.spawnPlayers();
         this.spawnTorch();
         this.startTime = Time.time;
@@ -286,7 +334,7 @@ public class GameManager : MonoBehaviour {
 
     private void spawnPlayers() {
         LevelManager level = LevelManager.instance;
-        int numPlayers = level.numPlayers;
+        int numPlayers = level.parameters.players;
 
         Debug.Log("Spawning " + numPlayers + " players!");
 

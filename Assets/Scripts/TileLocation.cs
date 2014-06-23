@@ -225,6 +225,27 @@ public struct BoundedTiles {
     public TileLocation fromIndex(int index) {
         return new TileLocation(index / this.bound.c, index % this.bound.c);
     }
+
+    public TileLocation[] neighbors(TileLocation l) {
+        TileLocation n = TileLocation.notFound;
+        TileLocation e = TileLocation.notFound;
+        TileLocation s = TileLocation.notFound;
+        TileLocation w = TileLocation.notFound;
+
+        int count = 0;
+        if (l.r > 0             ) { s = l.south; ++count; }
+        if (l.c > 0             ) { w = l.west;  ++count; }
+        if (l.r < this.bound.r-1) { n = l.north; ++count; }
+        if (l.c < this.bound.c-1) { e = l.east;  ++count; }
+
+        TileLocation[] result = new TileLocation[count];
+        count = 0;
+        if (s != TileLocation.notFound) { result[count++] = s; }
+        if (e != TileLocation.notFound) { result[count++] = e; }
+        if (n != TileLocation.notFound) { result[count++] = n; }
+        if (w != TileLocation.notFound) { result[count++] = w; }
+        return result;
+    }
 }
 
 // Structure representing a particular tile location (r, c)
@@ -240,8 +261,6 @@ public struct TileLocation {
     public static float distance(TileLocation c1, TileLocation c2) {
         int dc = c2.c - c1.c;
         int dr = c2.r - c1.r;
-        dc = dc < 0 ? -dc : dc;
-        dr = dr < 0 ? -dr : dr;
         return Mathf.Sqrt(dc*dc + dr*dr);
     }
 

@@ -16,7 +16,7 @@ public class LevelManager : MonoBehaviour {
     public GameObject[] trapPrefabs;
 
     public BoundedTiles tiles;
-    private bool[] trappedTiles;
+    private List<TileLocation> trapLocations;
     private GameObject xClipWallPrefab = null;
     private GameObject yClipWallPrefab = null;
 
@@ -29,9 +29,13 @@ public class LevelManager : MonoBehaviour {
 
     public void Awake() {
         // just make sure they have some sensible values. the game manager should beginRound() with the real values before it matters though
-        this._rows = 10;
-        this._columns = 10;
-        this._numPlayers = 1;
+        this._parameters = new LevelParameters {
+            trapFraction = 0.05f,
+            extraPathFraction = 0.0f,
+            rows = 10,
+            columns = 10,
+            players = 1
+        };
 
         if (instance == null) {
             instance = this;
@@ -55,13 +59,12 @@ public class LevelManager : MonoBehaviour {
 
 	public void Update() { }
 
-    public void beginRound(int numPlayers, int rows, int columns) {
+    public void beginRound(LevelParameters parameters) {
         this.endRound();
 
-        this._rows = rows;
-        this._columns = columns;
-        this._numPlayers = numPlayers;
-        this.tiles = new BoundedTiles(new TileLocation(this.rows, this.columns));
+        this._parameters = parameters;
+
+        this.tiles = new BoundedTiles(new TileLocation(this.parameters.rows, this.parameters.columns));
         this.computeSpawnRegion();
         this.positionBorder();
         this.positionCameraAndLight();
@@ -76,20 +79,9 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
-    private int _rows;
-    private int _columns;
-    private int _numPlayers;
-
-    public int numPlayers {
-        get { return _numPlayers; }
-    }
-
-    public int rows {
-        get { return _rows; }
-    }
-
-    public int columns {
-        get { return _columns; }
+    private LevelParameters _parameters;
+    public LevelParameters parameters {
+        get { return _parameters; }
     }
 
     private List<TileLocation> _spawnRegion = null;
@@ -98,15 +90,15 @@ public class LevelManager : MonoBehaviour {
 
     private void computeSpawnRegion() {
         List<TileLocation> l = new List<TileLocation>();
-        int columns = (int)Mathf.Ceil(Mathf.Sqrt(this._numPlayers));
-        int rows = (int)Mathf.Ceil((float)this._numPlayers / (float)columns);
+        int columns = (int)Mathf.Ceil(Mathf.Sqrt(this.parameters.players));
+        int rows = (int)Mathf.Ceil((float)this.parameters.players / (float)columns);
 
         TileLocation center = new TileLocation(this.tiles.bound.r / 2, this.tiles.bound.c / 2);
         TileLocation upperLeft = new TileLocation(center.r - rows / 2, center.c - columns / 2);
         TileLocation upperRight = new TileLocation(upperLeft.r, upperLeft.c + columns-1);
         TileLocation pos = upperLeft;
 
-        for (int i = 0; i < this._numPlayers; ++i) {
+        for (int i = 0; i < this.parameters.players; ++i) {
             l.Add(pos);
             Debug.Log("Spawn point of player " + i + " = " + pos);
             int c = pos.c + 1;
@@ -147,12 +139,10 @@ public class LevelManager : MonoBehaviour {
     }
 
     public bool isBadPlaceForThings(TileLocation l) {
-        return this.trappedTiles[this.tiles.indexOf(l)] || this.spawnRegion.Contains(l);
+        return this.trapLocations.Contains(l) || this.spawnRegion.Contains(l);
     }
 
     private void buildMap() {
-        System.Random rng = new System.Random();
-
         // create the floors
         foreach (TileLocation l in this.tiles.all) {
             GameObject floorPrefab = this.floorPrefabs[RNG.random.Next(floorPrefabs.Length)];
@@ -162,26 +152,35 @@ public class LevelManager : MonoBehaviour {
             floor.name = "Floor " + l;
         }
 
+
+        LevelBuilder levelBuilder;
+
+        /*
+        levelBuilder = new RandomWalkLevelBuilder (
+            extraWalks:  0,
+            numTraps:    (int)((this.tiles.bound.r * this.tiles.bound.c) * 0.05f),
+            tiles:       this.tiles,
+            spawnRegion: this.spawnRegion,
+        );
+        */
+        levelBuilder = new GrowthLevelBuilder (
+            parameters:  this.parameters,
+            tiles:       this.tiles,
+            spawnRegion: this.spawnRegion
+        );
+
+        levelBuilder.build();
+
+        TileWall[] walls = levelBuilder.walls;
+        this.trapLocations = levelBuilder.trapLocations;
+
         // create the traps
-        this.trappedTiles = new bool[this.tiles.count];
-        for (int i = 0; i < (this.tiles.bound.r * this.tiles.bound.c) * 0.05f; ++i) {
-            TileLocation l;
-            do { l = this.tiles.random(); } while (this.spawnRegion.Contains(l));
-
-            this.trappedTiles[this.tiles.indexOf(l)] = true;
-
+        foreach (TileLocation l in this.trapLocations) {
             GameObject trapPrefab = this.trapPrefabs[RNG.random.Next(trapPrefabs.Length)];
             Instantiate(trapPrefab, this.centerOfTile(l), Quaternion.identity);
         }
 
-        TileWall[] walls = new RandomWalkWallBuilder (
-            extraWalks:  0,
-            impassable:  this.trappedTiles,
-            tiles:       this.tiles,
-            spawnRegion: this.spawnRegion,
-            rng:         rng
-        ).build();
-
+        // create the walls
         foreach (TileLocation l in this.tiles.all) {
             TileWall w = walls[this.tiles.indexOf(l)];
             if (w.north && l.north.inBound(this.tiles)) {
@@ -319,279 +318,18 @@ public class LevelManager : MonoBehaviour {
     }
 }
 
-public class RandomWalkWallBuilder {
-    private int extraWalks;
-    private bool[] impassable;
-    private BoundedTiles tiles;
-    private List<TileLocation> spawnRegion;
-    private TileWall[] walls;
-    private bool[] reachable;
-    private bool[] flood;
-    private System.Random rng;
-    private List<TileLocation> randomLocations;
-    private IEnumerator<TileLocation> randomLocationEnumerator;
-
-    public RandomWalkWallBuilder(int extraWalks, bool[] impassable, BoundedTiles tiles, List<TileLocation> spawnRegion, System.Random rng) {
-        this.extraWalks = extraWalks;
-        this.impassable = impassable;
-        this.tiles = tiles;
-        this.spawnRegion = spawnRegion;
-        this.walls = new TileWall[this.tiles.count];
-        this.reachable = new bool[this.tiles.count];
-        this.flood = new bool[this.tiles.count];
-        this.randomLocations = this.tiles.shuffleAll();
-        this.randomLocationEnumerator = this.randomLocations.GetEnumerator();
-
-        foreach (TileLocation l in tiles.all) {
-            TileWall w = new TileWall();
-            this.walls[this.tiles.indexOf(l)] = w;
-            w.north = true;
-            w.east  = true;
-        }
-    }
-
-    private TileLocation nextRandomLocation() {
-        if (!this.randomLocationEnumerator.MoveNext()) {
-            this.randomLocations = this.tiles.shuffleAll();
-            this.randomLocationEnumerator = this.randomLocations.GetEnumerator();
-            this.randomLocationEnumerator.MoveNext();
-        }
-
-        return this.randomLocationEnumerator.Current;
-    }
-
-    private void debugWalls() {
-        string s = "";
-        for (int r = this.tiles.bound.r-1; r >= 0; --r) {
-            for (int c = 0; c < this.tiles.bound.c; ++c) {
-                TileWall w = this.walls[r*this.tiles.bound.c+c];
-                s += w.north ? "^" : ".";
-                s += w.east ? ">" : ".";
-            }
-            s += "\n";
-        }
-        Debug.Log(s);
-    }
-
-
-    public TileWall[] build() {
-        TileLocation spawnRegionNE = TileLocation.zero;
-        foreach (TileLocation l in this.spawnRegion) {
-            spawnRegionNE = new TileLocation(Mathf.Max(spawnRegionNE.r, l.r), Mathf.Max(spawnRegionNE.c, l.c));
-        }
-
-        foreach (TileLocation l in this.spawnRegion) {
-            if (l.r != spawnRegionNE.r) this.walls[this.tiles.indexOf(l)].north = false;
-            if (l.c != spawnRegionNE.c) this.walls[this.tiles.indexOf(l)].east  = false;
-        }
-
-        // create walls. start by making everything a wall, then pick random points and
-        // randomly walk from them bashing down walls for a finite number of steps. in
-        // order to remove isolated clusters keep on picking points that cannot be reached
-        // from the player origin
-
-        int walks = 0;
-        while (walks < 400) {
-            this.markReachable(this.spawnRegion, this.reachable);
-
-            TileLocation isolatedLocation = this.findIsolatedLocation(); // to off 'em
-
-            if (isolatedLocation == TileLocation.notFound) {
-                // no more isolated locations, so be done
-                break;
-            }
-
-            TileLocation nearestReachable = this.findNearestReachablePointTo(isolatedLocation);
-
-            if (walks > 200) {
-                Debug.Log("level build not converging: iteration " + walks + ": walking from " + isolatedLocation + " to " + nearestReachable);
-            }
-
-            this.randomWalk(isolatedLocation, nearestReachable);
-            ++walks;
-        }
-
-        Debug.Log("finished building necessary walls after " + walks + " walks");
-
-        for (int additionalWalks = 0; additionalWalks < this.extraWalks; ++additionalWalks) {
-            TileLocation a;
-            TileLocation b;
-            float dist;
-            do {
-                a = this.nextRandomLocation();
-                b = this.nextRandomLocation();
-                dist = TileLocation.distance(a, b);
-            } while (dist <= 1.0f || dist > this.tiles.bound.c/3*2);
-
-            this.randomWalk(a, b);
-        }
-
-        return this.walls;
-    }
-
-    private bool isReachable(TileLocation loc) {
-        return this.reachable[this.tiles.indexOf(loc)];
-    }
-
-    private TileLocation findIsolatedLocation() {
-        TileLocation bestLoc = TileLocation.notFound;
-        int bestReach = this.tiles.count;
-        int count = 0;
-        while (bestReach > 1 && count++ < this.tiles.count) {
-            TileLocation loc = this.nextRandomLocation();
-            int locIndex = this.tiles.indexOf(loc);
-            if (this.impassable[locIndex] || this.reachable[locIndex]) {
-                continue;
-            }
-            this.markReachable(new TileLocation[] { loc }, this.flood);
-            int reach = 0;
-            for (int i = 0; i < this.flood.Length; ++i) {
-                if (this.flood[i]) { reach += 1; }
-            }
-            if (reach < bestReach) {
-                bestReach = reach;
-                bestLoc = loc;
-            }
-        }
-
-        return bestLoc;
-    }
-
-    private bool walled(TileLocation l, CardinalDir d) {
-        switch (d) {
-            case CardinalDir.NORTH: return this.walls[this.tiles.indexOf(l)].north;
-            case CardinalDir.EAST:  return this.walls[this.tiles.indexOf(l)].east;
-            case CardinalDir.SOUTH: return !l.south.inBound(this.tiles) || this.walls[this.tiles.indexOf(l.south)].north;
-            default:                return !l.west .inBound(this.tiles) || this.walls[this.tiles.indexOf(l.west )].east;
-        }
-    }
-
-    private void markReachable(IEnumerable<TileLocation> initial, bool[] marks) {
-        for (int i = 0; i < marks.Length; ++i) {
-            marks[i] = false;
-        }
-
-        foreach (TileLocation loc in initial) {
-            marks[this.tiles.indexOf(loc)] = true;
-        }
-
-        bool updated;
-        do {
-            updated = false;
-
-            foreach (TileLocation l in this.tiles.all) {
-                bool wasMarked = marks[this.tiles.indexOf(l)];
-                if (wasMarked) continue;
-
-                TileLocation n = l.north;
-                TileLocation e = l.east;
-                TileLocation s = l.south;
-                TileLocation w = l.west;
-
-                bool nt = (this.passable(n) && !this.walled(l, CardinalDir.NORTH)) ? marks[this.tiles.indexOf(n)] : false;
-                bool et = (this.passable(e) && !this.walled(l, CardinalDir.EAST )) ? marks[this.tiles.indexOf(e)] : false;
-                bool st = (this.passable(s) && !this.walled(l, CardinalDir.SOUTH)) ? marks[this.tiles.indexOf(s)] : false;
-                bool wt = (this.passable(w) && !this.walled(l, CardinalDir.WEST )) ? marks[this.tiles.indexOf(w)] : false;
-
-                bool nowMarked = wasMarked || nt || et || st || wt;
-
-                updated = updated || (wasMarked != nowMarked);
-                marks[this.tiles.indexOf(l)] = nowMarked;
-
-            }
-        } while (updated);
-    }
-
-    private bool passable(TileLocation l) {
-        return l.inBound(this.tiles) && !this.impassable[this.tiles.indexOf(l)];
-    }
-
-    private TileLocation findNearestReachablePointTo(TileLocation l) {
-        float bestDist = -1.0f;
-        TileLocation bestLoc = TileLocation.notFound;
-
-        for (int i = 0; i < this.reachable.Length; ++i) {
-            if (!this.reachable[i] || this.impassable[i]) continue;
-            TileLocation m = this.tiles.fromIndex(i);
-            if (m == l) continue;
-
-            float dist = TileLocation.distance(l, m);
-            if (bestDist < 0.0f || dist < bestDist) {
-                bestDist = dist;
-                bestLoc = m;
-            }
-        }
-
-        return bestLoc;
-    }
-
-    private void randomWalk(TileLocation location, TileLocation target) {
-
-        CardinalDir[] onePreferredDirection = new CardinalDir[1];
-        CardinalDir[] twoPreferredDirections = new CardinalDir[2];
-
-        int steps = 0;
-        while (steps++ < 6) {
-            if (target == location) return;
-            CardinalDir[] preferredDirections;
-            if (target.r == location.r || target.c == location.c) {
-                preferredDirections = onePreferredDirection;
-                if (target.r < location.r) {
-                    preferredDirections[0] = CardinalDir.SOUTH;
-                } else if (target.r > location.r) {
-                    preferredDirections[0] = CardinalDir.NORTH;
-                } else if (target.c < location.c) {
-                    preferredDirections[0] = CardinalDir.WEST;
-                } else if (target.c > location.c) {
-                    preferredDirections[0] = CardinalDir.EAST;
-                }
-            } else {
-                preferredDirections = twoPreferredDirections;
-                if (target.r < location.r) {
-                    preferredDirections[0] = CardinalDir.SOUTH;
-                } else {
-                    preferredDirections[0] = CardinalDir.NORTH;
-                }
-
-                if (target.c < location.c) {
-                    preferredDirections[1] = CardinalDir.WEST;
-                } else {
-                    preferredDirections[1] = CardinalDir.EAST;
-                }
-            }
-
-            TileLocation next;
-            CardinalDir dir;
-            do {
-                int rand = RNG.random.Next(4 + preferredDirections.Length);
-                switch (rand) {
-                    case 0: dir = CardinalDir.NORTH; break;
-                    case 1: dir = CardinalDir.EAST;  break;
-                    case 2: dir = CardinalDir.SOUTH; break;
-                    case 3: dir = CardinalDir.WEST;  break;
-                    default: dir = preferredDirections[(rand - 4)]; break;
-                }
-                dir = (CardinalDir)RNG.random.Next(4);
-                next = location[dir];
-            } while (!next.inBound(this.tiles));
-
-            switch (dir) {
-                case CardinalDir.NORTH:
-                    this.walls[this.tiles.indexOf(location)].north = false;
-                    break;
-                case CardinalDir.EAST:
-                    this.walls[this.tiles.indexOf(location)].east = false;
-                    break;
-                case CardinalDir.SOUTH:
-                    this.walls[this.tiles.indexOf(next)].north = false;
-                    break;
-                default:
-                    this.walls[this.tiles.indexOf(next)].east = false;
-                    break;
-            }
-
-            location = next;
-        }
-    }
+public abstract class LevelBuilder {
+    public abstract TileWall[] walls { get; }
+    public abstract List<TileLocation> trapLocations { get; }
+    public abstract void build();
 }
 
+[System.Serializable]
+public struct LevelParameters {
+    public float keyFraction;
+    public float extraPathFraction;
+    public float trapFraction;
+    public int   players;
+    public int   rows;
+    public int   columns;
+}
