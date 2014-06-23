@@ -21,7 +21,7 @@ public class GhostManager : MonoBehaviour {
 		}
 
         if (currentTarget != null) {
-    		this.gameObject.transform.position = Vector3.MoveTowards(this.gameObject.transform.position, currentTarget.transform.position, (highestThreat * 0.005f) + 0.002f);
+    		this.gameObject.transform.position = Vector3.MoveTowards(this.gameObject.transform.position, currentTarget.transform.position, Time.deltaTime * ((highestThreat * 0.25f) + 0.15f));
         }
 	}
 
