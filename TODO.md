@@ -11,5 +11,5 @@ Stuff still to do
 - [ ] Key progression
 - [ ] Single player: show torch after dark
 - [ ] Increase volume of creepy music
-- [ ] Fix hitboxes
+- [X] Fix hitboxes
 
