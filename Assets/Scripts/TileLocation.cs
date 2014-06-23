@@ -218,6 +218,15 @@ public struct BoundedTiles {
         return RNG.random.Next() - RNG.random.Next();
     }
 
+    public TileLocation randomEdge(int offset) {
+        switch ((CardinalDir)RNG.random.Next(4)) {
+            case CardinalDir.NORTH: return new TileLocation(this.bound.r-1+offset, RNG.random.Next(this.bound.c));
+            case CardinalDir.EAST:  return new TileLocation(RNG.random.Next(this.bound.r), -offset);
+            case CardinalDir.SOUTH: return new TileLocation(-offset, RNG.random.Next(this.bound.c));
+            default:                return new TileLocation(RNG.random.Next(this.bound.r), this.bound.c-1+offset);
+        }
+    }
+
     public int indexOf(TileLocation l) {
         return l.r * this.bound.c + l.c;
     }
