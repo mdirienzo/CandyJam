@@ -24,11 +24,13 @@ public class GameManager : MonoBehaviour {
 	public static GameManager instance;
 
 	public List<GameObject> playerRefs;
+    public List<GameObject> ghostRefs;
 
 	// Game Control Variables
 	private float theDarkTime = 15;
     private float normalIntensity = 0.3f;
     private float torchIntensity = 0.75f;
+    private float lastGhostSpawn = 0.0f;
 
     private GameObject ghostPrefab;
     private GameObject sun;
@@ -40,6 +42,7 @@ public class GameManager : MonoBehaviour {
     private float startTime;
     private float sunRotation = 0.0f;
     private int keysObtained = 0;
+    private bool _isGhosts = false;
     private bool _isDark = false;
     private bool _isDoorOpen = false;
     private float _timeUntilDark = 15;
@@ -63,12 +66,17 @@ public class GameManager : MonoBehaviour {
         get { return LevelManager.instance.parameters.players; }
     }
 
+    public int targetGhosts {
+        get { return this.numGhosts + this.numPlayers * this.ghostsPerPlayer; }
+    }
+
     public int keysRequired {
         get { return (int)Mathf.Ceil(LevelManager.instance.parameters.players * LevelManager.instance.parameters.keyFraction); }
     }
 
 	public void Awake() {
 		this.playerRefs = new List<GameObject>();
+        this.ghostRefs = new List<GameObject>();
 
         this.nextLevelParameters = this.initLevelParameters;
 
@@ -274,7 +282,8 @@ public class GameManager : MonoBehaviour {
 
     // Update is called once per frame
     public void Update() {
-        float timeElapsed = Time.time - startTime;
+        float now = Time.time;
+        float timeElapsed = now - startTime;
         this._timeUntilDark = theDarkTime - timeElapsed;
 
         if (this.timeUntilDark < theDarkTime / 2.0f && this.timeUntilDark > 0.0f) {
@@ -295,6 +304,45 @@ public class GameManager : MonoBehaviour {
         if (this.timeUntilDark < 0.0f && !this.isDark) {
             this._isDark = true;
             this.Invoke("flashLightning1", 0.5f);
+        }
+
+        if (this._isGhosts) {
+            List<GameObject> removeGhosts = new List<GameObject>();
+            foreach (GameObject ghostObj in this.ghostRefs) {
+                GhostManager ghost = ghostObj.GetComponent<GhostManager>();
+                if (now > ghost.apparation + ghost.lifetime) {
+                    removeGhosts.Add(ghostObj);
+                }
+            }
+            foreach (GameObject removeGhost in removeGhosts) {
+                Destroy(removeGhost);
+                this.ghostRefs.Remove(removeGhost);
+            }
+
+            if (this.ghostRefs.Count < this.targetGhosts && now > this.lastGhostSpawn + 1.0f && this.playerRefs.Count > 0) {
+                this.lastGhostSpawn = now;
+                float nearestDistance;
+                Vector3 pos;
+                do {
+                    int victim = RNG.random.Next(this.playerRefs.Count);
+                    float a = (float)RNG.random.NextDouble() * 360.0f;
+                    float d = (float)RNG.random.NextDouble() * 2.0f + 2.0f;
+                    Quaternion r = Quaternion.Euler(0, 0, a);
+                    pos = this.playerRefs[victim].transform.position + (r * Vector3.up * d);
+                    nearestDistance = 0.0f;
+                    GameObject nearestPlayer = null;
+                    foreach (GameObject player in GameManager.instance.playerRefs) {
+                        float distance = Vector3.Distance(player.transform.position, pos);
+                        if (nearestPlayer == null || distance < nearestDistance) {
+                            nearestPlayer = player;
+                            nearestDistance = distance;
+                        }
+                    }
+                } while (nearestDistance <= 2.0f);
+
+                this.lastGhostSpawn = now;
+                this.ghostRefs.Add((GameObject)Instantiate(this.ghostPrefab, pos, Quaternion.identity));
+            }
         }
 
         if (Input.GetKeyUp(KeyCode.Escape) || Input.GetButtonUp("Pause")) {
@@ -326,6 +374,7 @@ public class GameManager : MonoBehaviour {
 
         SoundManager.instance.endRound();
 
+        this._isGhosts = false;
         this._isDark = false;
         this._isDoorOpen = false;
         this._timeUntilDark = this.theDarkTime;
@@ -336,6 +385,7 @@ public class GameManager : MonoBehaviour {
         sunRotation = 0.0f;
 
         this.playerRefs.Clear();
+        this.ghostRefs.Clear();
 
         foreach (string tag in this.managedTags) {
             foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag)) {
@@ -399,19 +449,10 @@ public class GameManager : MonoBehaviour {
 
     void flashLightning2() {
 		//SoundManager.instance.Thunder ();
-        this.spawnGhosts();
+        this._isGhosts = true;
         this.setLightning(2.0f);
         this.Invoke("dimLightning", 0.1f);
         this.Invoke("placeDoorAndKeys", 1.0f);
-    }
-
-    void spawnGhosts() {
-		//har har har
-		//SoundManager.instance.Laugh ();
-        for (int i = 0; i < numGhosts + numPlayers * this.ghostsPerPlayer; ++i) {
-            GameObject ghost = (GameObject)Instantiate(ghostPrefab, Vector3.zero, Quaternion.identity);
-            ghost.name = "Ghost " + i;
-        }
     }
 
     void placeDoorAndKeys() {
